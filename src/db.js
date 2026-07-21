@@ -2,6 +2,7 @@ const { Pool } = require("pg");
 const { db } = require("./config");
 const { hashPassword } = require("./auth");
 const { computeVulnerability } = require("./predictiveModel");
+const { calculateRiskScore } = require("./riskModel");
 
 const pool = new Pool(
   db.connectionString
@@ -20,6 +21,26 @@ const memoryUsers = [];
 const DEFAULT_USERS = [
   { username: "admin", password: "anemia2026", name: "Administradora General", role: "admin" },
   { username: "promotor", password: "anemia2026", name: "Promotor de Salud", role: "promotor" }
+];
+
+// Pacientes de EJEMPLO (ficticios) para que el dashboard nunca aparezca vacío en una
+// demo o despliegue serverless (donde el modo memoria se reinicia entre invocaciones).
+// No representan personas reales ni estadisticas oficiales; se registran a traves del
+// mismo flujo (y el mismo motor de riesgo) que un paciente real, y se pueden borrar
+// libremente conectando una base de datos real y eliminando estas filas.
+const DEMO_PATIENTS = [
+  { nombre: "Mayra Q. (ejemplo)", edad: 14, hb: 9.4, km: 12, omitidas: 7, idioma: "Quechua", departamento: "PUNO", provincia: "SAN ROMAN" },
+  { nombre: "Elmer H. (ejemplo)", edad: 8, hb: 7.9, km: 19, omitidas: 10, idioma: "Aymara", departamento: "PUNO", provincia: "CHUCUITO" },
+  { nombre: "Rosa T. (ejemplo)", edad: 7, hb: 8.1, km: 17, omitidas: 9, idioma: "Aymara", departamento: "PUNO", provincia: "CHUCUITO" },
+  { nombre: "Kevin A. (ejemplo)", edad: 20, hb: 9.6, km: 9, omitidas: 4, idioma: "Español", departamento: "PUNO", provincia: "AZANGARO" },
+  { nombre: "Diana P. (ejemplo)", edad: 24, hb: 11.4, km: 2, omitidas: 1, idioma: "Español", departamento: "PUNO", provincia: "PUNO" },
+  { nombre: "Fabricio L. (ejemplo)", edad: 16, hb: 9.7, km: 8, omitidas: 3, idioma: "Quechua", departamento: "PUNO", provincia: "MELGAR" },
+  { nombre: "Nayeli C. (ejemplo)", edad: 9, hb: 8.8, km: 11, omitidas: 6, idioma: "Quechua", departamento: "CUSCO" },
+  { nombre: "Josue M. (ejemplo)", edad: 30, hb: 11.6, km: 1.5, omitidas: 0, idioma: "Español", departamento: "LIMA" },
+  { nombre: "Ariana S. (ejemplo)", edad: 6, hb: 7.6, km: 20, omitidas: 11, idioma: "Aymara", departamento: "HUANCAVELICA" },
+  { nombre: "Bruno V. (ejemplo)", edad: 10, hb: 8.4, km: 15, omitidas: 8, idioma: "Quechua", departamento: "LORETO" },
+  { nombre: "Camila R. (ejemplo)", edad: 22, hb: 9.9, km: 6, omitidas: 3, idioma: "Español", departamento: "UCAYALI" },
+  { nombre: "Diego F. (ejemplo)", edad: 18, hb: 10.2, km: 5, omitidas: 2, idioma: "Español", departamento: "MADRE DE DIOS" }
 ];
 
 async function initDb() {
@@ -75,6 +96,17 @@ async function initDb() {
   }
 
   await seedDefaultUsers();
+  await seedDemoPatients();
+}
+
+async function seedDemoPatients() {
+  const existing = await getPatients();
+  if (existing.length > 0) return;
+
+  for (const patient of DEMO_PATIENTS) {
+    const prediction = calculateRiskScore(patient);
+    await createPatient({ ...patient, riskScore: prediction.score, riskLevel: prediction.level });
+  }
 }
 
 async function seedDefaultUsers() {
