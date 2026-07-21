@@ -17,34 +17,59 @@ function verifyPassword(password, stored) {
   return crypto.timingSafeEqual(hashBuffer, candidateBuffer);
 }
 
-const sessions = new Map();
+// Sesiones sin estado (firmadas con HMAC), no un Map en memoria.
+// En un entorno serverless (Vercel) cada request puede llegar a una instancia
+// distinta del proceso: un Map en memoria pierde la sesion entre requests y
+// deja al usuario fuera aunque la contrasena sea correcta. Firmando el propio
+// contenido de la sesion evitamos depender de que el servidor "recuerde" nada.
+function base64UrlEncode(input) {
+  return Buffer.from(input).toString("base64url");
+}
+
+function base64UrlDecode(input) {
+  return Buffer.from(input, "base64url").toString("utf8");
+}
+
+function sign(payload) {
+  const body = base64UrlEncode(JSON.stringify(payload));
+  const signature = crypto.createHmac("sha256", sessionConfig.secret).update(body).digest("base64url");
+  return `${body}.${signature}`;
+}
 
 function createSession(user) {
-  const token = crypto.randomBytes(32).toString("hex");
-  sessions.set(token, {
+  return sign({
     userId: user.id,
     username: user.username,
     name: user.name,
     role: user.role,
-    expiresAt: Date.now() + sessionConfig.ttlMs
+    exp: Date.now() + sessionConfig.ttlMs
   });
-  return token;
 }
 
 function getSession(token) {
-  if (!token) return null;
-  const record = sessions.get(token);
-  if (!record) return null;
-  if (record.expiresAt < Date.now()) {
-    sessions.delete(token);
+  if (!token || !token.includes(".")) return null;
+  const [body, signature] = token.split(".");
+  if (!body || !signature) return null;
+
+  const expected = crypto.createHmac("sha256", sessionConfig.secret).update(body).digest("base64url");
+  const signatureBuffer = Buffer.from(signature);
+  const expectedBuffer = Buffer.from(expected);
+  if (signatureBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(signatureBuffer, expectedBuffer)) {
     return null;
   }
-  return record;
+
+  try {
+    const payload = JSON.parse(base64UrlDecode(body));
+    if (!payload.exp || payload.exp < Date.now()) return null;
+    return payload;
+  } catch (error) {
+    return null;
+  }
 }
 
-function destroySession(token) {
-  sessions.delete(token);
-}
+// No hay estado del lado del servidor que borrar: el logout se resuelve
+// limpiando la cookie (ver /api/auth/logout en server.js).
+function destroySession() {}
 
 function parseCookies(header) {
   const cookies = {};
