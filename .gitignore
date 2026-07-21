@@ -2,3 +2,7 @@ node_modules
 .env
 npm-debug.log*
 .DS_Store
+
+# Datos crudos con identificadores de persona: no deben subirse al repo.
+# El resumen agregado sin PII vive en src/data/anemia_analytics.json (si se versiona).
+TB_DIGTEL_ANEMIA_ATENDIDOS.csv

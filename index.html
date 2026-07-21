@@ -537,6 +537,229 @@
       gap: 16px;
     }
 
+    /* ---------- Analytics view ---------- */
+    .note-banner {
+      background: var(--brand-soft);
+      color: var(--brand-dark);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .rank-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 90px;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      font-size: 0.83rem;
+    }
+
+    .rank-row:last-child { margin-bottom: 0; }
+
+    .rank-track {
+      height: 8px;
+      border-radius: 999px;
+      background: var(--gridline);
+      overflow: hidden;
+    }
+
+    .rank-track > i { display: block; height: 100%; border-radius: 999px; background: var(--brand); }
+
+    .rank-count { text-align: right; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+
+    .trend-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 18px;
+      height: 160px;
+      padding-top: 10px;
+    }
+
+    .trend-bar-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      height: 100%;
+      flex: 1;
+    }
+
+    .trend-bar-col .value {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .trend-bar-col .bar-fill {
+      width: 100%;
+      max-width: 56px;
+      border-radius: 8px 8px 0 0;
+      background: linear-gradient(180deg, var(--brand), var(--brand-dark));
+    }
+
+    .trend-bar-col .year-label {
+      margin-top: 8px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .trend-gap-note {
+      margin-top: 10px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .heatmap-table {
+      border-collapse: separate;
+      border-spacing: 4px;
+      width: 100%;
+    }
+
+    .heatmap-table th {
+      background: transparent;
+      position: static;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      padding: 4px 6px;
+      text-align: center;
+    }
+
+    .heatmap-table th:first-child { text-align: left; }
+
+    .heatmap-table td {
+      border-bottom: none;
+      text-align: center;
+      border-radius: 8px;
+      padding: 10px 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .heatmap-table td.year-cell {
+      text-align: left;
+      font-weight: 700;
+      color: var(--text-primary);
+      background: transparent;
+      padding-left: 4px;
+    }
+
+    .diag-table td, .diag-table th { font-size: 0.82rem; }
+
+    .diag-bar {
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--gridline);
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .diag-bar > i { display: block; height: 100%; background: var(--brand); border-radius: 999px; }
+
+    @media (max-width: 980px) {
+      .analytics-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ---------- Live Peru map ---------- */
+    .map-layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .map-card { padding: 16px; }
+
+    .map-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .map-zoom-controls { display: flex; gap: 6px; flex-shrink: 0; }
+    .map-zoom-controls button {
+      width: 36px;
+      margin-top: 0;
+      padding: 8px 0;
+      font-size: 1rem;
+    }
+    .map-zoom-controls #btnZoomReset { width: auto; padding: 8px 12px; font-size: 0.8rem; }
+
+    .map-stage {
+      height: 560px;
+      border-radius: 12px;
+      background: linear-gradient(160deg, #eef4fb, #f7f9fc);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .map-stage.grabbing { cursor: grabbing; }
+
+    #peruMapLive { width: 100%; height: 100%; display: block; }
+
+    #peruMapLayer path {
+      fill: var(--brand-soft);
+      stroke: #ffffff;
+      stroke-width: 1.2;
+      transition: fill 0.12s ease;
+      cursor: pointer;
+    }
+
+    #peruMapLayer path:hover { fill: #bcd7f5; }
+    #peruMapLayer path.has-data { fill: var(--brand); }
+    #peruMapLayer path.no-data { fill: var(--brand-soft); }
+    #peruMapLayer path.focus-region { stroke: var(--brand-dark); stroke-width: 2; stroke-dasharray: 3 2; }
+    #peruMapLayer path.selected { stroke: var(--brand-dark); stroke-width: 2.5; stroke-dasharray: none; }
+
+    #peruMapLayer text.dept-label {
+      font-size: 13px;
+      font-weight: 700;
+      fill: var(--text-secondary);
+      text-anchor: middle;
+      pointer-events: none;
+    }
+
+    .map-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      justify-content: center;
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+
+    .legend-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    .map-side { min-height: 300px; }
+
+    @media (max-width: 980px) {
+      .map-layout { grid-template-columns: 1fr; }
+      .map-stage { height: 420px; }
+    }
+
     hr.sep {
       border: none;
       border-top: 1px solid var(--gridline);
@@ -600,6 +823,8 @@
       <button class="nav-btn" data-view="overview"><span class="dot"></span>Resumen</button>
       <button class="nav-btn" data-view="patients"><span class="dot"></span>Pacientes</button>
       <button class="nav-btn" data-view="register" data-role="admin,promotor"><span class="dot"></span>Registrar paciente</button>
+      <button class="nav-btn" data-view="map"><span class="dot"></span>Mapa en vivo</button>
+      <button class="nav-btn" data-view="analytics"><span class="dot"></span>Análisis histórico</button>
       <button class="nav-btn" data-view="settings" data-role="admin"><span class="dot"></span>Configuración Telegram</button>
 
       <div class="sidebar-spacer"></div>
@@ -723,11 +948,140 @@
             </div>
           </div>
 
+          <label for="f_departamento">Departamento</label>
+          <select id="f_departamento"><option value="PUNO">Puno</option></select>
+
           <label for="f_chat">Chat ID de Telegram del cuidador (opcional)</label>
           <input id="f_chat" placeholder="Ej. 123456789">
 
           <button class="btn-main" id="btnRegistrar" style="margin-top:14px">Calcular riesgo y registrar</button>
           <button class="btn-muted" id="btnDemo">Cargar datos demo</button>
+        </div>
+      </section>
+
+      <!-- ---- Live map ---- -->
+      <section class="view" id="view-map">
+        <div class="topbar">
+          <div>
+            <h2>Mapa en vivo</h2>
+            <p>Distribución real de pacientes registrados en anemia_zero por departamento. Crece con cada registro.</p>
+          </div>
+        </div>
+
+        <div class="map-layout">
+          <div class="card map-card">
+            <div class="map-toolbar">
+              <span class="small">Arrastra para mover · rueda del mouse o pellizco para zoom · clic en un departamento para ver el detalle · doble clic para acercarte</span>
+              <div class="map-zoom-controls">
+                <button class="btn-muted" id="btnZoomIn" title="Acercar">+</button>
+                <button class="btn-muted" id="btnZoomOut" title="Alejar">−</button>
+                <button class="btn-muted" id="btnZoomReset" title="Vista completa">Reset</button>
+              </div>
+            </div>
+            <div class="map-stage" id="mapStage">
+              <svg id="peruMapLive" xmlns="http://www.w3.org/2000/svg">
+                <g id="peruMapLayer"></g>
+              </svg>
+            </div>
+            <div class="map-legend" id="mapLegend"></div>
+          </div>
+
+          <div class="card map-side" id="mapSide">
+            <div id="mapSideDefault">
+              <h3>Resumen nacional</h3>
+              <p class="card-sub">Selecciona un departamento en el mapa para ver su detalle.</p>
+              <div class="stat" style="margin-bottom:10px"><span class="label">Pacientes registrados</span><b id="map_total">0</b></div>
+              <div class="stat"><span class="label">Departamentos con pacientes</span><b id="map_deptCount">0</b></div>
+            </div>
+            <div id="mapSideDetail" hidden>
+              <div style="display:flex;align-items:flex-start;justify-content:space-between">
+                <h3 id="map_deptName">-</h3>
+                <button class="btn-muted" id="btnMapClose" style="width:auto;padding:6px 10px;margin-top:0">✕</button>
+              </div>
+              <div class="stat" style="margin-bottom:10px"><span class="label">Pacientes en este departamento</span><b id="map_deptTotal">0</b></div>
+              <div id="map_deptRisk"></div>
+              <p class="small" style="margin-top:10px">Hb promedio: <strong id="map_deptHb">-</strong></p>
+              <div id="map_deptEmpty" hidden>
+                <p class="small">Aún no hay pacientes registrados en este departamento.</p>
+                <button class="btn-main" id="btnMapRegisterHere">Registrar paciente aquí</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---- Analytics ---- -->
+      <section class="view" id="view-analytics">
+        <div class="topbar">
+          <div>
+            <h2>Análisis histórico de atenciones</h2>
+            <p>Base <code>TB_DIGTEL_ANEMIA_ATENDIDOS.csv</code> · <span id="an_total">-</span> atenciones registradas.</p>
+          </div>
+        </div>
+
+        <div class="note-banner" id="an_note">Cargando notas de la fuente de datos…</div>
+
+        <div class="stats">
+          <div class="stat"><span class="label">Atenciones históricas</span><b id="an_s_total">-</b></div>
+          <div class="stat"><span class="label">Periodo cubierto</span><b id="an_s_periodo" style="font-size:1.1rem">-</b></div>
+          <div class="stat"><span class="label">Zonas (código interno)</span><b id="an_s_zonas">-</b></div>
+          <div class="stat"><span class="label">Establecimientos</span><b id="an_s_eess">-</b></div>
+        </div>
+
+        <div class="note-banner">
+          Esta base histórica no trae departamento real por caso (solo códigos internos de zona). Para ver la distribución geográfica real y en vivo de los pacientes registrados en <strong>anemia_zero</strong>, ve a <strong>Mapa en vivo</strong> en el menú lateral.
+        </div>
+
+        <div class="card">
+          <h3>Evolución anual de atenciones</h3>
+          <p class="card-sub">Casos registrados por año dentro del periodo cubierto por la base.</p>
+          <div class="trend-chart" id="an_trend"></div>
+          <p class="trend-gap-note" id="an_trend_gap"></p>
+        </div>
+
+        <div class="card">
+          <h3>Mapa de calor: atenciones por año y grupo etario</h3>
+          <p class="card-sub">Intensidad de color según volumen de casos. Pasa el cursor sobre una celda para ver el detalle.</p>
+          <div class="table-wrap">
+            <table class="heatmap-table" id="an_heatmap"></table>
+          </div>
+        </div>
+
+        <div class="analytics-grid">
+          <div class="card">
+            <h3>Distribución por sexo</h3>
+            <div id="an_sexo"></div>
+          </div>
+          <div class="card">
+            <h3>Distribución por grupo etario</h3>
+            <div id="an_etapa"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Diagnósticos más frecuentes</h3>
+          <p class="card-sub">Códigos CIE-10 de anemia con mayor número de atenciones registradas.</p>
+          <div class="table-wrap">
+            <table class="diag-table">
+              <thead>
+                <tr><th>Código</th><th>Diagnóstico</th><th>Casos</th><th>%</th></tr>
+              </thead>
+              <tbody id="an_diagnostico"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="analytics-grid">
+          <div class="card">
+            <h3>Top 15 zonas por volumen de casos</h3>
+            <p class="card-sub">Código interno de ubigeo (pendiente tabla de nombres reales para mostrar el mapa geográfico).</p>
+            <div id="an_zonas"></div>
+          </div>
+          <div class="card">
+            <h3>Top 15 establecimientos por volumen de casos</h3>
+            <p class="card-sub">Código interno de EESS (pendiente maestro de establecimientos con nombre/coordenadas).</p>
+            <div id="an_eess"></div>
+          </div>
         </div>
       </section>
 
@@ -766,7 +1120,11 @@
     const state = {
       user: null,
       patients: [],
-      currentView: "overview"
+      currentView: "overview",
+      peruDepartments: null,
+      deptByName: {},
+      deptStats: {},
+      selectedDept: null
     };
 
     function levelColor(level) {
@@ -886,6 +1244,7 @@
         km: Number(document.getElementById("f_km").value || 0),
         omitidas: Number(document.getElementById("f_om").value || 0),
         idioma: document.getElementById("f_idioma").value,
+        departamento: document.getElementById("f_departamento").value,
         chatId: document.getElementById("f_chat").value.trim()
       };
     }
@@ -982,7 +1341,414 @@
     }
 
     async function refreshAll() {
-      await Promise.all([refreshPatients(), refreshStats()]);
+      await Promise.all([refreshPatients(), refreshStats(), refreshAnalytics()]);
+      await initPeruMap();
+      await refreshMapChoropleth();
+    }
+
+    // ---------- Live Peru map: data, select options ----------
+    async function loadPeruDepartments() {
+      if (state.peruDepartments) return state.peruDepartments;
+      const result = await api("/api/geo/peru-departments");
+      if (!result.ok) return null;
+      state.peruDepartments = result.data;
+      state.deptByName = {};
+      result.data.departments.forEach((d) => { state.deptByName[d.name] = d; });
+      populateDepartmentSelect(result.data.departments);
+      return result.data;
+    }
+
+    function populateDepartmentSelect(departments) {
+      const select = document.getElementById("f_departamento");
+      const rest = departments.filter((d) => d.name !== "PUNO").sort((a, b) => a.label.localeCompare(b.label, "es"));
+      const puno = departments.find((d) => d.name === "PUNO");
+      const ordered = puno ? [puno, ...rest] : rest;
+      select.innerHTML = ordered.map((d) => `<option value="${d.name}">${d.label}</option>`).join("");
+    }
+
+    // ---------- Live Peru map: zoom/pan engine ----------
+    const mapView = { scale: 1, tx: 0, ty: 0, min: 1, max: 10 };
+    let mapInitialized = false;
+    let mapDrag = null;
+    let mapPinch = null;
+    let mapJustDragged = false;
+
+    function applyMapTransform() {
+      const layer = document.getElementById("peruMapLayer");
+      layer.setAttribute("transform", `translate(${mapView.tx},${mapView.ty}) scale(${mapView.scale})`);
+    }
+
+    function getSvgPoint(clientX, clientY) {
+      const svg = document.getElementById("peruMapLive");
+      const pt = svg.createSVGPoint();
+      pt.x = clientX;
+      pt.y = clientY;
+      const ctm = svg.getScreenCTM();
+      if (!ctm) return { x: 0, y: 0 };
+      const transformed = pt.matrixTransform(ctm.inverse());
+      return { x: transformed.x, y: transformed.y };
+    }
+
+    function zoomAt(px, py, newScale) {
+      const clamped = Math.min(mapView.max, Math.max(mapView.min, newScale));
+      const cx = (px - mapView.tx) / mapView.scale;
+      const cy = (py - mapView.ty) / mapView.scale;
+      mapView.tx = px - clamped * cx;
+      mapView.ty = py - clamped * cy;
+      mapView.scale = clamped;
+      applyMapTransform();
+    }
+
+    function resetMapView() {
+      mapView.scale = 1;
+      mapView.tx = 0;
+      mapView.ty = 0;
+      applyMapTransform();
+    }
+
+    function zoomToBbox(bbox) {
+      const data = state.peruDepartments;
+      if (!data) return;
+      const [x1, y1, x2, y2] = bbox;
+      const bw = Math.max(x2 - x1, 1);
+      const bh = Math.max(y2 - y1, 1);
+
+      // Fit the bbox inside the viewBox-space stage with some padding.
+      const padding = 0.75;
+      const scaleX = (data.viewBoxWidth / bw) * padding;
+      const scaleY = (data.viewBoxHeight / bh) * padding;
+      const scale = Math.min(Math.max(Math.min(scaleX, scaleY), mapView.min), mapView.max);
+
+      const centerX = (x1 + x2) / 2;
+      const centerY = (y1 + y2) / 2;
+      mapView.scale = scale;
+      mapView.tx = data.viewBoxWidth / 2 - scale * centerX;
+      mapView.ty = data.viewBoxHeight / 2 - scale * centerY;
+      applyMapTransform();
+    }
+
+    function setupMapInteractions() {
+      const stage = document.getElementById("mapStage");
+      const svg = document.getElementById("peruMapLive");
+
+      stage.addEventListener("wheel", (event) => {
+        event.preventDefault();
+        const point = getSvgPoint(event.clientX, event.clientY);
+        const factor = event.deltaY < 0 ? 1.2 : 1 / 1.2;
+        zoomAt(point.x, point.y, mapView.scale * factor);
+      }, { passive: false });
+
+      stage.addEventListener("mousedown", (event) => {
+        if (event.button !== 0) return;
+        mapDrag = { startClient: { x: event.clientX, y: event.clientY }, lastPoint: getSvgPoint(event.clientX, event.clientY), moved: 0 };
+        stage.classList.add("grabbing");
+      });
+
+      window.addEventListener("mousemove", (event) => {
+        if (!mapDrag) return;
+        const point = getSvgPoint(event.clientX, event.clientY);
+        mapView.tx += point.x - mapDrag.lastPoint.x;
+        mapView.ty += point.y - mapDrag.lastPoint.y;
+        mapDrag.lastPoint = point;
+        mapDrag.moved += Math.abs(event.clientX - mapDrag.startClient.x) + Math.abs(event.clientY - mapDrag.startClient.y);
+        applyMapTransform();
+      });
+
+      window.addEventListener("mouseup", () => {
+        if (mapDrag) {
+          mapJustDragged = mapDrag.moved > 6;
+          setTimeout(() => { mapJustDragged = false; }, 0);
+        }
+        mapDrag = null;
+        stage.classList.remove("grabbing");
+      });
+
+      stage.addEventListener("touchstart", (event) => {
+        if (event.touches.length === 1) {
+          const t = event.touches[0];
+          mapDrag = { lastPoint: getSvgPoint(t.clientX, t.clientY), moved: 0 };
+        } else if (event.touches.length === 2) {
+          mapDrag = null;
+          const [t1, t2] = event.touches;
+          mapPinch = {
+            startDist: Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY),
+            startScale: mapView.scale
+          };
+        }
+      }, { passive: true });
+
+      stage.addEventListener("touchmove", (event) => {
+        if (event.touches.length === 1 && mapDrag) {
+          const t = event.touches[0];
+          const point = getSvgPoint(t.clientX, t.clientY);
+          mapView.tx += point.x - mapDrag.lastPoint.x;
+          mapView.ty += point.y - mapDrag.lastPoint.y;
+          mapDrag.lastPoint = point;
+          mapDrag.moved += 1;
+          applyMapTransform();
+        } else if (event.touches.length === 2 && mapPinch) {
+          const [t1, t2] = event.touches;
+          const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+          const mid = getSvgPoint((t1.clientX + t2.clientX) / 2, (t1.clientY + t2.clientY) / 2);
+          zoomAt(mid.x, mid.y, mapPinch.startScale * (dist / mapPinch.startDist));
+        }
+      }, { passive: true });
+
+      stage.addEventListener("touchend", () => {
+        mapDrag = null;
+        mapPinch = null;
+      });
+
+      document.getElementById("btnZoomIn").addEventListener("click", () => {
+        const data = state.peruDepartments;
+        zoomAt(data.viewBoxWidth / 2, data.viewBoxHeight / 2, mapView.scale * 1.4);
+      });
+      document.getElementById("btnZoomOut").addEventListener("click", () => {
+        const data = state.peruDepartments;
+        zoomAt(data.viewBoxWidth / 2, data.viewBoxHeight / 2, mapView.scale / 1.4);
+      });
+      document.getElementById("btnZoomReset").addEventListener("click", resetMapView);
+    }
+
+    // ---------- Live Peru map: build + choropleth + side panel ----------
+    async function initPeruMap() {
+      if (mapInitialized) return;
+      const data = await loadPeruDepartments();
+      if (!data) return;
+
+      const svg = document.getElementById("peruMapLive");
+      svg.setAttribute("viewBox", `0 0 ${data.viewBoxWidth} ${data.viewBoxHeight}`);
+
+      const layer = document.getElementById("peruMapLayer");
+      layer.innerHTML = data.departments.map((dep) => {
+        const focusClass = dep.name === "PUNO" ? " focus-region" : "";
+        return `<path data-name="${dep.name}" d="${dep.path}" class="no-data${focusClass}" fill-rule="evenodd"><title>${dep.label}</title></path>`;
+      }).join("");
+
+      layer.querySelectorAll("path").forEach((path) => {
+        path.addEventListener("click", () => {
+          if (mapJustDragged) return;
+          selectDepartment(path.dataset.name);
+        });
+        path.addEventListener("dblclick", () => {
+          selectDepartment(path.dataset.name);
+          zoomToBbox(state.deptByName[path.dataset.name].bbox);
+        });
+      });
+
+      setupMapInteractions();
+      renderMapLegend(0);
+      mapInitialized = true;
+    }
+
+    function renderMapLegend(maxCount) {
+      const steps = ["#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95"];
+      const legend = document.getElementById("mapLegend");
+      const swatches = steps.map((color, i) => {
+        const approx = Math.round((maxCount / steps.length) * (i + 1));
+        return `<span class="legend-item"><span class="legend-swatch" style="background:${color}"></span>${i === steps.length - 1 ? approx + "+" : approx}</span>`;
+      });
+      legend.innerHTML = `
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--brand-soft)"></span>Sin pacientes</span>
+        ${swatches.join("")}
+        <span class="legend-item"><span class="legend-swatch" style="border:2px dashed var(--brand-dark);background:transparent"></span>Puno (foco del proyecto)</span>
+      `;
+    }
+
+    async function refreshMapChoropleth() {
+      if (!mapInitialized) return;
+      const result = await api("/api/geo/patients-by-department");
+      if (!result.ok) return;
+
+      state.deptStats = {};
+      result.data.forEach((row) => { state.deptStats[row.departamento] = row; });
+
+      const maxTotal = Math.max(...result.data.map((r) => r.total), 1);
+      renderMapLegend(maxTotal);
+
+      document.querySelectorAll("#peruMapLayer path").forEach((path) => {
+        const stat = state.deptStats[path.dataset.name];
+        if (stat && stat.total > 0) {
+          path.classList.remove("no-data");
+          path.classList.add("has-data");
+          const { color } = sequentialBlue(stat.total / maxTotal);
+          path.style.fill = color;
+        } else {
+          path.classList.remove("has-data");
+          path.classList.add("no-data");
+          path.style.fill = "";
+        }
+      });
+
+      document.getElementById("map_total").textContent = result.data.reduce((sum, r) => sum + r.total, 0);
+      document.getElementById("map_deptCount").textContent = result.data.filter((r) => r.total > 0).length;
+
+      if (state.selectedDept) {
+        renderDeptDetail(state.selectedDept);
+      }
+    }
+
+    function selectDepartment(name) {
+      state.selectedDept = name;
+      document.querySelectorAll("#peruMapLayer path").forEach((path) => {
+        path.classList.toggle("selected", path.dataset.name === name);
+      });
+      renderDeptDetail(name);
+    }
+
+    function renderDeptDetail(name) {
+      const dept = state.deptByName[name];
+      const stat = state.deptStats && state.deptStats[name];
+      document.getElementById("mapSideDefault").hidden = true;
+      document.getElementById("mapSideDetail").hidden = false;
+      document.getElementById("map_deptName").textContent = dept ? dept.label : name;
+
+      const total = stat ? stat.total : 0;
+      document.getElementById("map_deptTotal").textContent = total;
+      document.getElementById("map_deptHb").textContent = stat && stat.hbPromedio != null ? stat.hbPromedio : "-";
+
+      const emptyBox = document.getElementById("map_deptEmpty");
+      const riskBox = document.getElementById("map_deptRisk");
+
+      if (!stat || total === 0) {
+        emptyBox.hidden = false;
+        riskBox.innerHTML = "";
+      } else {
+        emptyBox.hidden = true;
+        const levels = [
+          { key: "alto", label: "Alto", color: "var(--status-critical)" },
+          { key: "medio", label: "Medio", color: "var(--status-warning)" },
+          { key: "bajo", label: "Bajo", color: "var(--status-good)" }
+        ];
+        riskBox.innerHTML = levels.map((lvl) => {
+          const count = stat[lvl.key] || 0;
+          const pct = total ? Math.round((count / total) * 100) : 0;
+          return `
+            <div class="risk-row">
+              <span>${lvl.label}</span>
+              <div class="risk-track"><i style="width:${pct}%;background:${lvl.color}"></i></div>
+              <span class="risk-count">${count} (${pct}%)</span>
+            </div>
+          `;
+        }).join("");
+      }
+    }
+
+    function closeDeptDetail() {
+      state.selectedDept = null;
+      document.querySelectorAll("#peruMapLayer path").forEach((path) => path.classList.remove("selected"));
+      document.getElementById("mapSideDefault").hidden = false;
+      document.getElementById("mapSideDetail").hidden = true;
+    }
+
+    // ---------- Historical analytics (TB_DIGTEL_ANEMIA_ATENDIDOS) ----------
+    function sequentialBlue(t) {
+      const steps = ["#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95"];
+      const idx = Math.min(steps.length - 1, Math.floor(t * steps.length));
+      return { color: steps[idx], dark: idx >= 3 };
+    }
+
+    function formatDate(yyyymmdd) {
+      if (!yyyymmdd || yyyymmdd.length !== 8) return yyyymmdd || "-";
+      return `${yyyymmdd.slice(6, 8)}/${yyyymmdd.slice(4, 6)}/${yyyymmdd.slice(0, 4)}`;
+    }
+
+    function renderRankList(container, items, idPrefix) {
+      const max = items.length ? items[0].count : 1;
+      container.innerHTML = items.map((item) => `
+        <div class="rank-row">
+          <span>${idPrefix} #${item.id}</span>
+          <div class="rank-track"><i style="width:${(item.count / max) * 100}%"></i></div>
+          <span class="rank-count">${item.count} (${item.pct}%)</span>
+        </div>
+      `).join("");
+    }
+
+    function renderTrend(data) {
+      const container = document.getElementById("an_trend");
+      const max = Math.max(...data.yearTrend.map((y) => y.count), 1);
+      container.innerHTML = data.yearTrend.map((y) => `
+        <div class="trend-bar-col">
+          <span class="value">${y.count.toLocaleString("es-PE")}</span>
+          <div class="bar-fill" style="height:${(y.count / max) * 100}%"></div>
+          <span class="year-label">${y.year}</span>
+        </div>
+      `).join("");
+
+      const coveredYears = data.yearTrend.map((y) => y.year);
+      const allYears = [];
+      const fromYear = Number(data.dateRange.from.slice(0, 4));
+      const toYear = Number(data.dateRange.to.slice(0, 4));
+      for (let y = fromYear; y <= toYear; y++) allYears.push(String(y));
+      const missing = allYears.filter((y) => !coveredYears.includes(y));
+
+      document.getElementById("an_trend_gap").textContent = missing.length
+        ? `Sin atenciones registradas en la base para: ${missing.join(", ")}.`
+        : "";
+    }
+
+    function renderHeatmap(data) {
+      const { years, etapas, matrix } = data.heatmap;
+      const max = Math.max(...matrix.flat(), 1);
+
+      let html = "<thead><tr><th>Año</th>";
+      etapas.forEach((e) => { html += `<th>${e.label}</th>`; });
+      html += "</tr></thead><tbody>";
+
+      years.forEach((year, rowIdx) => {
+        html += `<tr><td class="year-cell">${year}</td>`;
+        etapas.forEach((e, colIdx) => {
+          const count = matrix[rowIdx][colIdx];
+          const { color, dark } = sequentialBlue(count / max);
+          html += `<td title="${year} · ${e.label}: ${count} casos" style="background:${color};color:${dark ? "#fff" : "#0b1120"}">${count}</td>`;
+        });
+        html += "</tr>";
+      });
+      html += "</tbody>";
+      document.getElementById("an_heatmap").innerHTML = html;
+    }
+
+    function renderDistribution(container, items) {
+      const max = items.length ? Math.max(...items.map((i) => i.count)) : 1;
+      container.innerHTML = items.map((item) => `
+        <div class="rank-row">
+          <span>${item.label}</span>
+          <div class="rank-track"><i style="width:${(item.count / max) * 100}%"></i></div>
+          <span class="rank-count">${item.count.toLocaleString("es-PE")} (${item.pct}%)</span>
+        </div>
+      `).join("");
+    }
+
+    function renderDiagnostico(items) {
+      document.getElementById("an_diagnostico").innerHTML = items.map((item) => `
+        <tr>
+          <td><strong>${item.code}</strong></td>
+          <td>${item.label}<div class="diag-bar"><i style="width:${item.pct}%"></i></div></td>
+          <td>${item.count.toLocaleString("es-PE")}</td>
+          <td>${item.pct}%</td>
+        </tr>
+      `).join("");
+    }
+
+    async function refreshAnalytics() {
+      const result = await api("/api/analytics/anemia");
+      if (!result.ok) return;
+      const data = result.data;
+
+      document.getElementById("an_total").textContent = data.total.toLocaleString("es-PE");
+      document.getElementById("an_note").textContent = data.note;
+      document.getElementById("an_s_total").textContent = data.total.toLocaleString("es-PE");
+      document.getElementById("an_s_periodo").textContent = `${formatDate(data.dateRange.from)} - ${formatDate(data.dateRange.to)}`;
+      document.getElementById("an_s_zonas").textContent = data.uniqueZonas.toLocaleString("es-PE");
+      document.getElementById("an_s_eess").textContent = data.uniqueEstablecimientos.toLocaleString("es-PE");
+
+      renderTrend(data);
+      renderHeatmap(data);
+      renderDistribution(document.getElementById("an_sexo"), data.sexo);
+      renderDistribution(document.getElementById("an_etapa"), data.etapa);
+      renderDiagnostico(data.diagnostico);
+      renderRankList(document.getElementById("an_zonas"), data.topZonas.slice(0, 15), "Zona");
+      renderRankList(document.getElementById("an_eess"), data.topEstablecimientos.slice(0, 15), "EESS");
     }
 
     async function registerPatient() {
@@ -1098,6 +1864,13 @@
       document.getElementById("btnProbarBot").addEventListener("click", testTelegram);
       document.getElementById("btnWebhook").addEventListener("click", setupWebhook);
       document.getElementById("patientSearch").addEventListener("input", renderPatients);
+      document.getElementById("btnMapClose").addEventListener("click", closeDeptDetail);
+      document.getElementById("btnMapRegisterHere").addEventListener("click", () => {
+        if (state.selectedDept) {
+          document.getElementById("f_departamento").value = state.selectedDept;
+        }
+        switchView("register");
+      });
 
       checkSession();
     }
