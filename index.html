@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HemoPuno MVP | IA para seguimiento de anemia infantil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #f4f0e8;
+      --bg-alt: #fdfaf4;
+      --ink: #1f2520;
+      --ink-soft: #4c584c;
+      --line: #d7d4ca;
+      --card: rgba(255, 255, 255, 0.75);
+      --hero-a: #ffb347;
+      --hero-b: #ff6b35;
+      --hero-c: #2a9d8f;
+      --ok: #2d936c;
+      --warn: #c9782f;
+      --bad: #c44536;
+      --radius: 18px;
+      --shadow: 0 24px 60px rgba(31, 37, 32, 0.14);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Outfit", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 10%, rgba(255, 179, 71, 0.25), transparent 35%),
+        radial-gradient(circle at 85% 12%, rgba(42, 157, 143, 0.26), transparent 30%),
+        linear-gradient(160deg, var(--bg-main), var(--bg-alt));
+      min-height: 100vh;
+    }
+
+    .noise {
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+      background-size: 3px 3px;
+      pointer-events: none;
+      opacity: 0.25;
+      z-index: -1;
+    }
+
+    header {
+      padding: 26px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 13px;
+      background: linear-gradient(145deg, var(--hero-a), var(--hero-b));
+      box-shadow: 0 8px 20px rgba(196, 69, 54, 0.3);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 1.3rem;
+      font-family: "Space Grotesk", sans-serif;
+      letter-spacing: -0.5px;
+    }
+
+    .brand p {
+      margin: 2px 0 0;
+      color: var(--ink-soft);
+      font-size: 0.88rem;
+    }
+
+    .status {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.65);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      color: var(--ink-soft);
+    }
+
+    .container {
+      width: min(1280px, calc(100% - 36px));
+      margin: 0 auto 30px;
+    }
+
+    .hero {
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      background: linear-gradient(140deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.55));
+      backdrop-filter: blur(6px);
+      margin-bottom: 22px;
+      animation: rise .75s ease;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 0;
+    }
+
+    .hero-content {
+      padding: 34px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(42, 157, 143, 0.12);
+      color: #1f6f65;
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    .hero h2 {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: clamp(1.8rem, 2.3vw, 2.5rem);
+      margin: 14px 0 10px;
+      line-height: 1.15;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--ink-soft);
+      line-height: 1.5;
+      max-width: 62ch;
+    }
+
+    .hero-side {
+      background:
+        linear-gradient(180deg, rgba(255, 107, 53, 0.13), rgba(42, 157, 143, 0.16)),
+        linear-gradient(135deg, #f8dfc6, #d8ece3);
+      padding: 28px;
+      display: grid;
+      grid-template-columns: 1fr;
+      align-content: center;
+      gap: 12px;
+    }
+
+    .side-pill {
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      border-radius: 14px;
+      padding: 13px 14px;
+    }
+
+    .side-pill b {
+      display: block;
+      margin-bottom: 2px;
+      font-size: 1.05rem;
+      font-family: "Space Grotesk", sans-serif;
+    }
+
+    .side-pill span {
+      color: var(--ink-soft);
+      font-size: 0.9rem;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 26px rgba(31, 37, 32, 0.08);
+      padding: 20px;
+      animation: rise .8s ease;
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 1.1rem;
+    }
+
+    .card p,
+    .card li {
+      color: var(--ink-soft);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .card ul {
+      margin: 10px 0 0;
+      padding-left: 18px;
+    }
+
+    .mvp {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 14px;
+    }
+
+    .panel {
+      background: #fbf7f0;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+    }
+
+    .panel h4 {
+      margin: 0 0 8px;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: #687463;
+    }
+
+    label {
+      display: block;
+      margin-top: 9px;
+      margin-bottom: 5px;
+      font-size: 0.82rem;
+      color: #576356;
+      font-weight: 500;
+    }
+
+    input,
+    select,
+    button {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid #cfc8b8;
+      padding: 10px;
+      font: inherit;
+    }
+
+    input,
+    select {
+      background: rgba(255, 255, 255, 0.86);
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      margin-top: 10px;
+      font-weight: 600;
+    }
+
+    .btn-main {
+      background: linear-gradient(135deg, var(--hero-b), #e85e3b);
+      color: #fff;
+      box-shadow: 0 10px 18px rgba(200, 70, 42, 0.25);
+    }
+
+    .btn-alt {
+      background: linear-gradient(135deg, var(--hero-c), #1f8a7e);
+      color: #fff;
+      box-shadow: 0 10px 18px rgba(42, 157, 143, 0.24);
+    }
+
+    .btn-muted {
+      background: #fff;
+      color: #4f5a4d;
+      border: 1px solid #d8d1c2;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .stat {
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .stat b {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 1.5rem;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .stat span {
+      color: var(--ink-soft);
+      font-size: 0.82rem;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid #ddd6c8;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 720px;
+    }
+
+    th,
+    td {
+      padding: 11px 10px;
+      text-align: left;
+      border-bottom: 1px solid #eee6d7;
+    }
+
+    th {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #6d7869;
+      background: #fcf8f2;
+      position: sticky;
+      top: 0;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+
+    .pill.alto { background: rgba(196, 69, 54, 0.13); color: var(--bad); }
+    .pill.medio { background: rgba(201, 120, 47, 0.14); color: var(--warn); }
+    .pill.bajo { background: rgba(45, 147, 108, 0.14); color: var(--ok); }
+
+    .bar {
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: #ece4d5;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .bar > i {
+      display: block;
+      height: 100%;
+    }
+
+    .log {
+      margin-top: 10px;
+      border-radius: 10px;
+      border: 1px solid #d2cbbd;
+      background: #fff;
+      color: #405048;
+      height: 170px;
+      overflow: auto;
+      padding: 10px;
+      font-size: 0.79rem;
+      white-space: pre-wrap;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .small {
+      color: #62705f;
+      font-size: 0.8rem;
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 1020px) {
+      .hero-grid,
+      .mvp,
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      header {
+        padding: 20px 18px;
+      }
+
+      .container {
+        width: min(1280px, calc(100% - 20px));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="noise"></div>
+  <header>
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div>
+        <h1>HemoPuno MVP</h1>
+        <p>Seguimiento nutricional automatizado con IA para postas rurales de Puno</p>
+      </div>
+    </div>
+    <div class="status" id="botState">Telegram: no verificado</div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="hero-grid">
+        <div class="hero-content">
+          <span class="eyebrow">Hackatón · Solución ODS 3</span>
+          <h2>De la entrega de chispitas al acompañamiento inteligente y continuo</h2>
+          <p>
+            La plataforma convierte un seguimiento reactivo en una intervención proactiva: predice riesgo de abandono,
+            prioriza familias críticas y activa mensajes culturalmente adaptados para sostener el tratamiento contra la anemia infantil.
+          </p>
+        </div>
+        <aside class="hero-side">
+          <div class="side-pill">
+            <b>Problema clave</b>
+            <span>Brecha de adopción por barreras socioculturales y falta de acompañamiento.</span>
+          </div>
+          <div class="side-pill">
+            <b>Usuario directo</b>
+            <span>Personal médico y promotores de salud de postas en Puno.</span>
+          </div>
+          <div class="side-pill">
+            <b>Impacto esperado</b>
+            <span>Menor deserción del tratamiento y mejora de hemoglobina en menores de 3 años.</span>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="two-col">
+      <article class="card">
+        <h3>Funcionamiento de la solución</h3>
+        <ul>
+          <li><strong>Arquitectura y gestión:</strong> Web app con Node.js + base de datos PostgreSQL para registro clínico estructurado.</li>
+          <li><strong>Modelo predictivo:</strong> Un score tabular clasifica el riesgo de abandono en bajo, medio o alto.</li>
+          <li><strong>Acompañamiento multiagente:</strong> Mensajería automatizada por Telegram con lenguaje contextual y recomendaciones locales.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>Sostenibilidad y escalabilidad</h3>
+        <ul>
+          <li><strong>Modelo inicial B2G:</strong> acuerdos con MINSA, DIRESA y gobiernos locales.</li>
+          <li><strong>Financiamiento:</strong> postulación a grants de salud digital e innovación social.</li>
+          <li><strong>Escala:</strong> empaquetable como SaaS o marca blanca para ONGs y clínicas privadas.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="card">
+      <h3>MVP Operativo</h3>
+      <div class="mvp">
+        <div class="panel">
+          <h4>Registrar niño</h4>
+          <label for="f_nombre">Nombre del niño</label>
+          <input id="f_nombre" placeholder="Ej. Mayra Q.">
+
+          <label for="f_edad">Edad (meses)</label>
+          <input id="f_edad" type="number" value="18">
+
+          <label for="f_hb">Hemoglobina (g/dL)</label>
+          <input id="f_hb" type="number" step="0.1" value="10.2">
+
+          <label for="f_km">Distancia a la posta (km)</label>
+          <input id="f_km" type="number" step="0.5" value="6">
+
+          <label for="f_om">Dosis omitidas último mes</label>
+          <input id="f_om" type="number" value="3">
+
+          <label for="f_idioma">Idioma del hogar</label>
+          <select id="f_idioma">
+            <option>Quechua</option>
+            <option>Aymara</option>
+            <option>Español</option>
+          </select>
+
+          <label for="f_chat">Chat ID de Telegram del cuidador</label>
+          <input id="f_chat" placeholder="Ej. 123456789">
+
+          <button class="btn-main" id="btnRegistrar">Calcular riesgo y registrar</button>
+          <button class="btn-muted" id="btnDemo">Cargar demo</button>
+
+          <hr style="border:none;border-top:1px solid #ddd6c8;margin:14px 0 10px">
+
+          <h4>Conexión BotFather</h4>
+          <label for="bot_token">Token del bot (opcional para demo)</label>
+          <input id="bot_token" placeholder="123456:AA...">
+
+          <label for="webhook_url">Base URL pública para webhook</label>
+          <input id="webhook_url" placeholder="https://tu-dominio-o-ngrok.app">
+
+          <button class="btn-alt" id="btnProbarBot">Probar getMe</button>
+          <button class="btn-muted" id="btnWebhook">Configurar webhook</button>
+          <p class="small">Si no hay token, el sistema funciona en modo simulación para hackatón.</p>
+          <div class="log" id="log">[sistema] esperando eventos...</div>
+        </div>
+
+        <div>
+          <div class="stats">
+            <div class="stat"><b id="s_total">0</b><span>Niños monitoreados</span></div>
+            <div class="stat"><b id="s_alto" style="color:var(--bad)">0</b><span>Riesgo alto</span></div>
+            <div class="stat"><b id="s_hb">-</b><span>Hb promedio</span></div>
+            <div class="stat"><b id="s_msg">0</b><span>Mensajes enviados</span></div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Niño</th>
+                  <th>Edad</th>
+                  <th>Hb</th>
+                  <th>Riesgo</th>
+                  <th>Idioma</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+          <p class="small" id="vacio" style="margin-top:8px">Sin pacientes registrados aún.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const state = {
+      patients: []
+    };
+
+    function levelColor(level) {
+      if (level === "alto") return "var(--bad)";
+      if (level === "medio") return "var(--warn)";
+      return "var(--ok)";
+    }
+
+    function log(message) {
+      const el = document.getElementById("log");
+      el.textContent += `\n> ${message}`;
+      el.scrollTop = el.scrollHeight;
+    }
+
+    async function api(path, options) {
+      const response = await fetch(path, {
+        headers: { "Content-Type": "application/json" },
+        ...options
+      });
+      return response.json();
+    }
+
+    function getFormPatient() {
+      return {
+        nombre: document.getElementById("f_nombre").value.trim() || "Sin nombre",
+        edad: Number(document.getElementById("f_edad").value || 0),
+        hb: Number(document.getElementById("f_hb").value || 0),
+        km: Number(document.getElementById("f_km").value || 0),
+        omitidas: Number(document.getElementById("f_om").value || 0),
+        idioma: document.getElementById("f_idioma").value,
+        chatId: document.getElementById("f_chat").value.trim()
+      };
+    }
+
+    function renderPatients() {
+      const tbody = document.getElementById("tbody");
+      tbody.innerHTML = state.patients.map((p) => {
+        const color = levelColor(p.riskLevel);
+        return `
+          <tr>
+            <td><strong>${p.nombre}</strong><br><span class="small">${p.km} km de la posta</span></td>
+            <td>${p.edad} m</td>
+            <td>${Number(p.hb).toFixed(1)}</td>
+            <td>
+              <span class="pill ${p.riskLevel}">${p.riskScore}% ${p.riskLevel}</span>
+              <div class="bar"><i style="width:${p.riskScore}%;background:${color}"></i></div>
+            </td>
+            <td>${p.idioma}</td>
+            <td><button class="btn-muted" onclick="sendFollowup(${p.id})">Enviar seguimiento</button></td>
+          </tr>
+        `;
+      }).join("");
+
+      document.getElementById("vacio").style.display = state.patients.length ? "none" : "block";
+    }
+
+    async function refreshStats() {
+      const stats = await api("/api/stats");
+      if (!stats.ok) return;
+      document.getElementById("s_total").textContent = stats.data.total;
+      document.getElementById("s_alto").textContent = stats.data.alto;
+      document.getElementById("s_hb").textContent = stats.data.hbPromedio ?? "-";
+      document.getElementById("s_msg").textContent = stats.data.mensajesEnviados;
+    }
+
+    async function refreshPatients() {
+      const result = await api("/api/patients");
+      if (result.ok) {
+        state.patients = result.data;
+        renderPatients();
+      }
+    }
+
+    async function registerPatient() {
+      const payload = getFormPatient();
+      const result = await api("/api/patients", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+
+      if (!result.ok) {
+        log(`error registrando: ${result.error || "desconocido"}`);
+        return;
+      }
+
+      const { patient, prediction } = result.data;
+      log(`registro: ${patient.nombre} -> ${prediction.score}% (${prediction.level})`);
+      await refreshPatients();
+      await refreshStats();
+    }
+
+    async function sendFollowup(patientId) {
+      const patient = state.patients.find((item) => Number(item.id) === Number(patientId));
+      if (!patient) return;
+      if (!patient.chatId) {
+        log(`paciente ${patient.nombre} no tiene chatId`);
+        return;
+      }
+
+      const token = document.getElementById("bot_token").value.trim();
+      const result = await api("/api/messages/send", {
+        method: "POST",
+        body: JSON.stringify({
+          patientId: patient.id,
+          chatId: patient.chatId,
+          nombre: patient.nombre,
+          riskLevel: patient.riskLevel,
+          token
+        })
+      });
+
+      if (result.ok) {
+        const mode = result.simulated ? "simulado" : "real";
+        log(`mensaje ${mode} enviado a ${patient.nombre}`);
+      } else {
+        log("fallo enviando mensaje por Telegram");
+      }
+
+      await refreshStats();
+    }
+
+    async function testTelegram() {
+      const token = document.getElementById("bot_token").value.trim();
+      const result = await api("/api/telegram/get-me", {
+        method: "POST",
+        body: JSON.stringify({ token })
+      });
+
+      if (result.ok && result.result) {
+        document.getElementById("botState").textContent = `Telegram: @${result.result.username} conectado`;
+        log(`bot conectado como @${result.result.username}`);
+      } else {
+        document.getElementById("botState").textContent = "Telegram: modo simulación";
+        log(result.description || "no se pudo conectar con Telegram");
+      }
+    }
+
+    async function setupWebhook() {
+      const token = document.getElementById("bot_token").value.trim();
+      const webhookBaseUrl = document.getElementById("webhook_url").value.trim();
+      const result = await api("/api/telegram/set-webhook", {
+        method: "POST",
+        body: JSON.stringify({ token, webhookBaseUrl })
+      });
+
+      if (result.ok) {
+        log(`webhook configurado: ${result.configuredWebhook}`);
+      } else {
+        log(result.description || "no se pudo configurar webhook");
+      }
+    }
+
+    async function seedDemo() {
+      const demo = [
+        { nombre: "Mayra Q.", edad: 14, hb: 9.4, km: 12, omitidas: 7, idioma: "Quechua", chatId: "" },
+        { nombre: "Elmer H.", edad: 22, hb: 10.8, km: 4, omitidas: 2, idioma: "Aymara", chatId: "" },
+        { nombre: "Nayeli C.", edad: 9, hb: 10.1, km: 8, omitidas: 5, idioma: "Quechua", chatId: "" },
+        { nombre: "Josue M.", edad: 30, hb: 11.6, km: 1.5, omitidas: 0, idioma: "Español", chatId: "" },
+        { nombre: "Rosa T.", edad: 6, hb: 9.9, km: 15, omitidas: 4, idioma: "Aymara", chatId: "" }
+      ];
+
+      for (const patient of demo) {
+        await api("/api/patients", {
+          method: "POST",
+          body: JSON.stringify(patient)
+        });
+      }
+
+      log("datos demo cargados");
+      await refreshPatients();
+      await refreshStats();
+    }
+
+    async function initialize() {
+      document.getElementById("btnRegistrar").addEventListener("click", registerPatient);
+      document.getElementById("btnProbarBot").addEventListener("click", testTelegram);
+      document.getElementById("btnWebhook").addEventListener("click", setupWebhook);
+      document.getElementById("btnDemo").addEventListener("click", seedDemo);
+
+      await refreshPatients();
+      await refreshStats();
+      log("panel listo");
+    }
+
+    initialize();
+  </script>
+</body>
+</html>

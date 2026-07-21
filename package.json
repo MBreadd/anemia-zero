@@ -1,0 +1,26 @@
+{
+  "name": "hemopuno-mvp",
+  "version": "1.0.0",
+  "description": "MVP de seguimiento nutricional y riesgo de abandono para anemia infantil en Puno",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js"
+  },
+  "keywords": [
+    "hackathon",
+    "salud",
+    "anemia",
+    "telegram",
+    "ods3"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "morgan": "^1.10.0",
+    "pg": "^8.16.3"
+  }
+}
