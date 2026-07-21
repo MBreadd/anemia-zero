@@ -10,10 +10,13 @@ const {
   createPatient,
   createOutboundMessage,
   getStats,
-  getUserByUsername
+  getUserByUsername,
+  getPatientsByDepartment
 } = require("./db");
 const { calculateRiskScore } = require("./riskModel");
 const telegramService = require("./services/telegram");
+const anemiaAnalytics = require("./data/anemia_analytics.json");
+const peruDepartments = require("./data/peru_departments.json");
 const {
   verifyPassword,
   createSession,
@@ -100,6 +103,23 @@ app.get("/api/patients", requireAuth, async (req, res, next) => {
 app.post("/api/predict", requireAuth, (req, res) => {
   const prediction = calculateRiskScore(req.body || {});
   res.json({ ok: true, data: prediction });
+});
+
+app.get("/api/analytics/anemia", requireAuth, (req, res) => {
+  res.json({ ok: true, data: anemiaAnalytics });
+});
+
+app.get("/api/geo/peru-departments", requireAuth, (req, res) => {
+  res.json({ ok: true, data: peruDepartments });
+});
+
+app.get("/api/geo/patients-by-department", requireAuth, async (req, res, next) => {
+  try {
+    const rows = await getPatientsByDepartment();
+    res.json({ ok: true, data: rows });
+  } catch (error) {
+    next(error);
+  }
 });
 
 app.get("/api/stats", requireAuth, async (req, res, next) => {

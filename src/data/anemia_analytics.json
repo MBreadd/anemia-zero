@@ -1,0 +1,446 @@
+{
+  "generatedAt": "2026-07-21T19:48:28.023Z",
+  "source": "TB_DIGTEL_ANEMIA_ATENDIDOS.csv",
+  "total": 405273,
+  "dateRange": {
+    "from": "20190101",
+    "to": "20230731"
+  },
+  "uniqueZonas": 1850,
+  "uniqueEstablecimientos": 7318,
+  "diagnostico": [
+    {
+      "code": "D509",
+      "label": "Anemia por deficiencia de hierro, no especificada",
+      "count": 366097,
+      "pct": 90.3
+    },
+    {
+      "code": "D649",
+      "label": "Anemia, no especificada",
+      "count": 21974,
+      "pct": 5.4
+    },
+    {
+      "code": "D539",
+      "label": "Anemia nutricional, no especificada",
+      "count": 4386,
+      "pct": 1.1
+    },
+    {
+      "code": "D500",
+      "label": "Anemia por deficiencia de hierro secundaria a pérdida de sangre crónica",
+      "count": 2785,
+      "pct": 0.7
+    },
+    {
+      "code": "D508",
+      "label": "Otras anemias por deficiencia de hierro",
+      "count": 2503,
+      "pct": 0.6
+    },
+    {
+      "code": "D519",
+      "label": "Anemia por deficiencia de vitamina B12, no especificada",
+      "count": 825,
+      "pct": 0.2
+    },
+    {
+      "code": "D638",
+      "label": "Anemia en otras enfermedades crónicas clasificadas en otra parte",
+      "count": 743,
+      "pct": 0.2
+    },
+    {
+      "code": "D648",
+      "label": "Otras anemias especificadas",
+      "count": 562,
+      "pct": 0.1
+    },
+    {
+      "code": "D529",
+      "label": "Anemia por deficiencia de folato, no especificada",
+      "count": 408,
+      "pct": 0.1
+    },
+    {
+      "code": "D619",
+      "label": "Anemia aplásica, no especificada",
+      "count": 326,
+      "pct": 0.1
+    },
+    {
+      "code": "D591",
+      "label": "Otras anemias hemolíticas autoinmunes",
+      "count": 303,
+      "pct": 0.1
+    },
+    {
+      "code": "D510",
+      "label": "Anemia por deficiencia de vitamina B12 por deficiencia dietética",
+      "count": 270,
+      "pct": 0.1
+    },
+    {
+      "code": "D590",
+      "label": "Otras anemias hemolíticas adquiridas",
+      "count": 266,
+      "pct": 0.1
+    },
+    {
+      "code": "D62X",
+      "label": "Anemia posthemorrágica aguda",
+      "count": 219,
+      "pct": 0.1
+    },
+    {
+      "code": "D610",
+      "label": "Anemia aplásica constitucional",
+      "count": 215,
+      "pct": 0.1
+    },
+    {
+      "code": "OTROS",
+      "label": "Otros diagnósticos de anemia (baja frecuencia)",
+      "count": 3391,
+      "pct": 0.8
+    }
+  ],
+  "tipoDx": [
+    {
+      "code": "R",
+      "label": "Repetido / control",
+      "count": 181683,
+      "pct": 44.8
+    },
+    {
+      "code": "D",
+      "label": "Definitivo",
+      "count": 120265,
+      "pct": 29.7
+    },
+    {
+      "code": "P",
+      "label": "Presuntivo",
+      "count": 103325,
+      "pct": 25.5
+    }
+  ],
+  "sexo": [
+    {
+      "code": "F",
+      "label": "Femenino",
+      "count": 217678,
+      "pct": 53.7
+    },
+    {
+      "code": "M",
+      "label": "Masculino",
+      "count": 187595,
+      "pct": 46.3
+    }
+  ],
+  "etapa": [
+    {
+      "key": "00a-11a",
+      "label": "0 a 11 años",
+      "count": 299259,
+      "pct": 73.8
+    },
+    {
+      "key": "12a-17a",
+      "label": "12 a 17 años",
+      "count": 24978,
+      "pct": 6.2
+    },
+    {
+      "key": "18a-29a",
+      "label": "18 a 29 años",
+      "count": 22733,
+      "pct": 5.6
+    },
+    {
+      "key": "30a-59a",
+      "label": "30 a 59 años",
+      "count": 35832,
+      "pct": 8.8
+    },
+    {
+      "key": "60a+",
+      "label": "60 años a más",
+      "count": 22471,
+      "pct": 5.5
+    }
+  ],
+  "yearTrend": [
+    {
+      "year": "2019",
+      "count": 147264
+    },
+    {
+      "year": "2021",
+      "count": 108822
+    },
+    {
+      "year": "2023",
+      "count": 149187
+    }
+  ],
+  "heatmap": {
+    "years": [
+      "2019",
+      "2021",
+      "2023"
+    ],
+    "etapas": [
+      {
+        "key": "00a-11a",
+        "label": "0 a 11 años"
+      },
+      {
+        "key": "12a-17a",
+        "label": "12 a 17 años"
+      },
+      {
+        "key": "18a-29a",
+        "label": "18 a 29 años"
+      },
+      {
+        "key": "30a-59a",
+        "label": "30 a 59 años"
+      },
+      {
+        "key": "60a+",
+        "label": "60 años a más"
+      }
+    ],
+    "matrix": [
+      [
+        106028,
+        10748,
+        9229,
+        12983,
+        8276
+      ],
+      [
+        91225,
+        2972,
+        4125,
+        6560,
+        3940
+      ],
+      [
+        102006,
+        11258,
+        9379,
+        16289,
+        10255
+      ]
+    ]
+  },
+  "topZonas": [
+    {
+      "id": "1312",
+      "count": 15820,
+      "pct": 3.9
+    },
+    {
+      "id": "1283",
+      "count": 10518,
+      "pct": 2.6
+    },
+    {
+      "id": "1290",
+      "count": 8675,
+      "pct": 2.1
+    },
+    {
+      "id": "1315",
+      "count": 8578,
+      "pct": 2.1
+    },
+    {
+      "id": "695",
+      "count": 6792,
+      "pct": 1.7
+    },
+    {
+      "id": "1281",
+      "count": 6398,
+      "pct": 1.6
+    },
+    {
+      "id": "690",
+      "count": 6020,
+      "pct": 1.5
+    },
+    {
+      "id": "1322",
+      "count": 5573,
+      "pct": 1.4
+    },
+    {
+      "id": "1286",
+      "count": 5480,
+      "pct": 1.4
+    },
+    {
+      "id": "1297",
+      "count": 5434,
+      "pct": 1.3
+    },
+    {
+      "id": "1305",
+      "count": 4605,
+      "pct": 1.1
+    },
+    {
+      "id": "1298",
+      "count": 4514,
+      "pct": 1.1
+    },
+    {
+      "id": "1313",
+      "count": 4413,
+      "pct": 1.1
+    },
+    {
+      "id": "1292",
+      "count": 3673,
+      "pct": 0.9
+    },
+    {
+      "id": "1323",
+      "count": 3668,
+      "pct": 0.9
+    },
+    {
+      "id": "1317",
+      "count": 3570,
+      "pct": 0.9
+    },
+    {
+      "id": "1291",
+      "count": 3305,
+      "pct": 0.8
+    },
+    {
+      "id": "",
+      "count": 3243,
+      "pct": 0.8
+    },
+    {
+      "id": "563",
+      "count": 2963,
+      "pct": 0.7
+    },
+    {
+      "id": "1308",
+      "count": 2879,
+      "pct": 0.7
+    }
+  ],
+  "topEstablecimientos": [
+    {
+      "id": "6213",
+      "count": 2655,
+      "pct": 0.7
+    },
+    {
+      "id": "5984",
+      "count": 1934,
+      "pct": 0.5
+    },
+    {
+      "id": "7437",
+      "count": 1794,
+      "pct": 0.4
+    },
+    {
+      "id": "6203",
+      "count": 1791,
+      "pct": 0.4
+    },
+    {
+      "id": "5919",
+      "count": 1506,
+      "pct": 0.4
+    },
+    {
+      "id": "6212",
+      "count": 1483,
+      "pct": 0.4
+    },
+    {
+      "id": "6195",
+      "count": 1408,
+      "pct": 0.3
+    },
+    {
+      "id": "5924",
+      "count": 1369,
+      "pct": 0.3
+    },
+    {
+      "id": "5850",
+      "count": 1339,
+      "pct": 0.3
+    },
+    {
+      "id": "5848",
+      "count": 1337,
+      "pct": 0.3
+    },
+    {
+      "id": "5621",
+      "count": 1314,
+      "pct": 0.3
+    },
+    {
+      "id": "5732",
+      "count": 1308,
+      "pct": 0.3
+    },
+    {
+      "id": "7279",
+      "count": 1266,
+      "pct": 0.3
+    },
+    {
+      "id": "7475",
+      "count": 1211,
+      "pct": 0.3
+    },
+    {
+      "id": "21646",
+      "count": 1211,
+      "pct": 0.3
+    },
+    {
+      "id": "6264",
+      "count": 1162,
+      "pct": 0.3
+    },
+    {
+      "id": "5882",
+      "count": 1149,
+      "pct": 0.3
+    },
+    {
+      "id": "5788",
+      "count": 1142,
+      "pct": 0.3
+    },
+    {
+      "id": "5813",
+      "count": 1134,
+      "pct": 0.3
+    },
+    {
+      "id": "16380",
+      "count": 1121,
+      "pct": 0.3
+    }
+  ],
+  "note": "id_ubigeo e id_eess son códigos internos del dataset original: no incluyen nombres de distrito ni coordenadas, por lo que se muestran como códigos hasta contar con una tabla de referencia real."
+}
