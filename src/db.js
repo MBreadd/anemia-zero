@@ -1,5 +1,6 @@
 const { Pool } = require("pg");
 const { db } = require("./config");
+const { hashPassword } = require("./auth");
 
 const pool = new Pool({
   host: db.host,
@@ -12,8 +13,15 @@ const pool = new Pool({
 let memoryMode = false;
 let patientCounter = 1;
 let messageCounter = 1;
+let userCounter = 1;
 const memoryPatients = [];
 const memoryMessages = [];
+const memoryUsers = [];
+
+const DEFAULT_USERS = [
+  { username: "admin", password: "anemia2026", name: "Administradora General", role: "admin" },
+  { username: "promotor", password: "anemia2026", name: "Promotor de Salud", role: "promotor" }
+];
 
 async function initDb() {
   try {
@@ -45,10 +53,73 @@ async function initDb() {
         created_at TIMESTAMP NOT NULL DEFAULT NOW()
       );
     `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id BIGSERIAL PRIMARY KEY,
+        username TEXT NOT NULL UNIQUE,
+        password_hash TEXT NOT NULL,
+        name TEXT NOT NULL,
+        role TEXT NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW()
+      );
+    `);
   } catch (error) {
     memoryMode = true;
     console.warn("PostgreSQL no disponible. Se activa modo memoria para demo.", error.message);
   }
+
+  await seedDefaultUsers();
+}
+
+async function seedDefaultUsers() {
+  for (const seed of DEFAULT_USERS) {
+    const existing = await getUserByUsername(seed.username);
+    if (!existing) {
+      await createUser({
+        username: seed.username,
+        passwordHash: hashPassword(seed.password),
+        name: seed.name,
+        role: seed.role
+      });
+    }
+  }
+}
+
+async function getUserByUsername(username) {
+  if (memoryMode) {
+    return memoryUsers.find((item) => item.username === username) || null;
+  }
+
+  const result = await pool.query(
+    `SELECT id, username, password_hash AS "passwordHash", name, role, created_at AS "createdAt"
+     FROM users WHERE username = $1`,
+    [username]
+  );
+  return result.rows[0] || null;
+}
+
+async function createUser(user) {
+  if (memoryMode) {
+    const createdUser = {
+      id: userCounter++,
+      username: user.username,
+      passwordHash: user.passwordHash,
+      name: user.name,
+      role: user.role,
+      createdAt: new Date().toISOString()
+    };
+    memoryUsers.push(createdUser);
+    return createdUser;
+  }
+
+  const result = await pool.query(
+    `INSERT INTO users (username, password_hash, name, role)
+     VALUES ($1, $2, $3, $4)
+     RETURNING id, username, password_hash AS "passwordHash", name, role, created_at AS "createdAt"`,
+    [user.username, user.passwordHash, user.name, user.role]
+  );
+  return result.rows[0];
 }
 
 async function getPatients() {
@@ -193,5 +264,7 @@ module.exports = {
   getPatients,
   createPatient,
   createOutboundMessage,
-  getStats
+  getStats,
+  getUserByUsername,
+  createUser
 };

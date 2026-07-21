@@ -1,7 +1,7 @@
 services:
   app:
     build: .
-    container_name: hemopuno_app
+    container_name: anemia_zero_app
     ports:
       - "3000:3000"
     environment:
@@ -9,23 +9,24 @@ services:
       APP_BASE_URL: http://localhost:3000
       DB_HOST: db
       DB_PORT: 5432
-      DB_USER: hemopuno
-      DB_PASSWORD: hemopuno
-      DB_NAME: hemopuno
+      DB_USER: anemia_zero
+      DB_PASSWORD: anemia_zero
+      DB_NAME: anemia_zero
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       TELEGRAM_WEBHOOK_SECRET: ${TELEGRAM_WEBHOOK_SECRET:-hackathon-secret}
       TELEGRAM_ALLOW_SIMULATION: ${TELEGRAM_ALLOW_SIMULATION:-true}
+      SESSION_SECRET: ${SESSION_SECRET:-cambia-este-secreto-en-produccion}
     depends_on:
       - db
 
   db:
     image: postgres:16-alpine
-    container_name: hemopuno_db
+    container_name: anemia_zero_db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: hemopuno
-      POSTGRES_USER: hemopuno
-      POSTGRES_PASSWORD: hemopuno
+      POSTGRES_DB: anemia_zero
+      POSTGRES_USER: anemia_zero
+      POSTGRES_PASSWORD: anemia_zero
     ports:
       - "5432:5432"
     volumes:

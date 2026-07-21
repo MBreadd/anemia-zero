@@ -1,7 +1,7 @@
 {
-  "name": "hemopuno-mvp",
+  "name": "anemia_zero",
   "version": "1.0.0",
-  "description": "MVP de seguimiento nutricional y riesgo de abandono para anemia infantil en Puno",
+  "description": "anemia_zero: plataforma de seguimiento nutricional y riesgo de abandono para anemia infantil en Puno",
   "main": "src/server.js",
   "scripts": {
     "dev": "node --watch src/server.js",

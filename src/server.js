@@ -3,16 +3,25 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 
-const { port, appBaseUrl, telegram } = require("./config");
+const { port, appBaseUrl, telegram, session: sessionConfig } = require("./config");
 const {
   initDb,
   getPatients,
   createPatient,
   createOutboundMessage,
-  getStats
+  getStats,
+  getUserByUsername
 } = require("./db");
 const { calculateRiskScore } = require("./riskModel");
 const telegramService = require("./services/telegram");
+const {
+  verifyPassword,
+  createSession,
+  destroySession,
+  parseCookies,
+  requireAuth,
+  requireRole
+} = require("./auth");
 
 const app = express();
 
@@ -24,12 +33,62 @@ app.use(express.static(path.join(__dirname, "..")));
 app.get("/api/health", async (req, res) => {
   res.json({
     status: "ok",
-    service: "hemopuno-mvp",
+    service: "anemia_zero",
     timestamp: new Date().toISOString()
   });
 });
 
-app.get("/api/patients", async (req, res, next) => {
+app.post("/api/auth/login", async (req, res, next) => {
+  try {
+    const { username, password } = req.body || {};
+    if (!username || !password) {
+      return res.status(400).json({ ok: false, error: "Usuario y contrasena son obligatorios" });
+    }
+
+    const user = await getUserByUsername(String(username).trim().toLowerCase());
+    if (!user || !verifyPassword(password, user.passwordHash)) {
+      return res.status(401).json({ ok: false, error: "Credenciales invalidas" });
+    }
+
+    const token = createSession(user);
+    const maxAgeSeconds = Math.floor(sessionConfig.ttlMs / 1000);
+    res.setHeader(
+      "Set-Cookie",
+      `${sessionConfig.cookieName}=${token}; HttpOnly; Path=/; Max-Age=${maxAgeSeconds}; SameSite=Lax`
+    );
+
+    return res.json({
+      ok: true,
+      data: { username: user.username, name: user.name, role: user.role }
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+app.post("/api/auth/logout", (req, res) => {
+  const cookies = parseCookies(req.headers.cookie);
+  const token = cookies[sessionConfig.cookieName];
+  destroySession(token);
+  res.setHeader(
+    "Set-Cookie",
+    `${sessionConfig.cookieName}=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax`
+  );
+  res.json({ ok: true });
+});
+
+app.get("/api/auth/me", requireAuth, (req, res) => {
+  res.json({
+    ok: true,
+    data: {
+      username: req.session.username,
+      name: req.session.name,
+      role: req.session.role
+    }
+  });
+});
+
+app.get("/api/patients", requireAuth, async (req, res, next) => {
   try {
     const rows = await getPatients();
     res.json({ ok: true, data: rows });
@@ -38,12 +97,12 @@ app.get("/api/patients", async (req, res, next) => {
   }
 });
 
-app.post("/api/predict", (req, res) => {
+app.post("/api/predict", requireAuth, (req, res) => {
   const prediction = calculateRiskScore(req.body || {});
   res.json({ ok: true, data: prediction });
 });
 
-app.get("/api/stats", async (req, res, next) => {
+app.get("/api/stats", requireAuth, async (req, res, next) => {
   try {
     const stats = await getStats();
     res.json({ ok: true, data: stats });
@@ -52,7 +111,7 @@ app.get("/api/stats", async (req, res, next) => {
   }
 });
 
-app.post("/api/patients", async (req, res, next) => {
+app.post("/api/patients", requireAuth, requireRole("admin", "promotor"), async (req, res, next) => {
   try {
     const body = req.body || {};
     const required = ["nombre", "edad", "hb", "km", "omitidas", "idioma"];
@@ -81,7 +140,7 @@ app.post("/api/patients", async (req, res, next) => {
   }
 });
 
-app.post("/api/messages/send", async (req, res, next) => {
+app.post("/api/messages/send", requireAuth, requireRole("admin", "promotor"), async (req, res, next) => {
   try {
     const { patientId, chatId, nombre, riskLevel, token } = req.body || {};
     if (!chatId) {
@@ -121,7 +180,7 @@ app.post("/api/messages/send", async (req, res, next) => {
   }
 });
 
-app.post("/api/telegram/get-me", async (req, res, next) => {
+app.post("/api/telegram/get-me", requireAuth, requireRole("admin"), async (req, res, next) => {
   try {
     const { token } = req.body || {};
     const response = await telegramService.getMe(token);
@@ -131,7 +190,7 @@ app.post("/api/telegram/get-me", async (req, res, next) => {
   }
 });
 
-app.post("/api/telegram/set-webhook", async (req, res, next) => {
+app.post("/api/telegram/set-webhook", requireAuth, requireRole("admin"), async (req, res, next) => {
   try {
     const { token, webhookBaseUrl } = req.body || {};
     const response = await telegramService.setWebhook({
@@ -177,7 +236,7 @@ app.use((error, req, res, next) => {
 async function bootstrap() {
   await initDb();
   app.listen(port, () => {
-    console.log(`HemoPuno MVP corriendo en http://localhost:${port}`);
+    console.log(`anemia_zero corriendo en http://localhost:${port}`);
   });
 }
 

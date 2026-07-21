@@ -3,312 +3,460 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HemoPuno MVP | IA para seguimiento de anemia infantil</title>
+  <title>anemia_zero | Plataforma de seguimiento de anemia infantil</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-main: #f4f0e8;
-      --bg-alt: #fdfaf4;
-      --ink: #1f2520;
-      --ink-soft: #4c584c;
-      --line: #d7d4ca;
-      --card: rgba(255, 255, 255, 0.75);
-      --hero-a: #ffb347;
-      --hero-b: #ff6b35;
-      --hero-c: #2a9d8f;
-      --ok: #2d936c;
-      --warn: #c9782f;
-      --bad: #c44536;
-      --radius: 18px;
-      --shadow: 0 24px 60px rgba(31, 37, 32, 0.14);
+      --surface-1: #fcfcfb;
+      --surface-2: #ffffff;
+      --page-plane: #f2f4f7;
+      --sidebar: #0f2647;
+      --sidebar-soft: #16325c;
+      --sidebar-ink: #dce6f5;
+      --sidebar-ink-muted: #90a5c4;
+      --text-primary: #0b1120;
+      --text-secondary: #52514e;
+      --text-muted: #6b7280;
+      --gridline: #e1e0d9;
+      --border: rgba(11,11,11,0.10);
+      --brand: #2a78d6;
+      --brand-dark: #184f95;
+      --brand-soft: #e8f1fc;
+      --status-good: #0ca30c;
+      --status-good-soft: #e6f7e6;
+      --status-warning: #c9782f;
+      --status-warning-soft: #fbeee1;
+      --status-critical: #d03b3b;
+      --status-critical-soft: #fbe7e7;
+      --radius: 14px;
+      --shadow: 0 10px 30px rgba(15, 38, 71, 0.08);
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: "Outfit", sans-serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at 12% 10%, rgba(255, 179, 71, 0.25), transparent 35%),
-        radial-gradient(circle at 85% 12%, rgba(42, 157, 143, 0.26), transparent 30%),
-        linear-gradient(160deg, var(--bg-main), var(--bg-alt));
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: var(--text-primary);
+      background: var(--page-plane);
       min-height: 100vh;
     }
 
-    .noise {
-      position: fixed;
-      inset: 0;
-      background-image: radial-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px);
-      background-size: 3px 3px;
-      pointer-events: none;
-      opacity: 0.25;
-      z-index: -1;
+    button, input, select {
+      font-family: inherit;
     }
 
-    header {
-      padding: 26px 28px;
+    /* ---------- Login screen ---------- */
+    #loginScreen {
+      min-height: 100vh;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .brand-mark {
-      width: 44px;
-      height: 44px;
-      border-radius: 13px;
-      background: linear-gradient(145deg, var(--hero-a), var(--hero-b));
-      box-shadow: 0 8px 20px rgba(196, 69, 54, 0.3);
-    }
-
-    .brand h1 {
-      margin: 0;
-      font-size: 1.3rem;
-      font-family: "Space Grotesk", sans-serif;
-      letter-spacing: -0.5px;
-    }
-
-    .brand p {
-      margin: 2px 0 0;
-      color: var(--ink-soft);
-      font-size: 0.88rem;
-    }
-
-    .status {
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.65);
-      padding: 10px 14px;
-      border-radius: 999px;
-      font-size: 0.88rem;
-      color: var(--ink-soft);
-    }
-
-    .container {
-      width: min(1280px, calc(100% - 36px));
-      margin: 0 auto 30px;
-    }
-
-    .hero {
-      border-radius: 28px;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      border: 1px solid rgba(255, 255, 255, 0.45);
-      background: linear-gradient(140deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.55));
-      backdrop-filter: blur(6px);
-      margin-bottom: 22px;
-      animation: rise .75s ease;
-    }
-
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: 0;
-    }
-
-    .hero-content {
-      padding: 34px;
-    }
-
-    .eyebrow {
-      display: inline-block;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(42, 157, 143, 0.12);
-      color: #1f6f65;
-      font-weight: 600;
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-    }
-
-    .hero h2 {
-      font-family: "Space Grotesk", sans-serif;
-      font-size: clamp(1.8rem, 2.3vw, 2.5rem);
-      margin: 14px 0 10px;
-      line-height: 1.15;
-    }
-
-    .hero p {
-      margin: 0;
-      color: var(--ink-soft);
-      line-height: 1.5;
-      max-width: 62ch;
-    }
-
-    .hero-side {
+      justify-content: center;
+      padding: 24px;
       background:
-        linear-gradient(180deg, rgba(255, 107, 53, 0.13), rgba(42, 157, 143, 0.16)),
-        linear-gradient(135deg, #f8dfc6, #d8ece3);
-      padding: 28px;
-      display: grid;
-      grid-template-columns: 1fr;
-      align-content: center;
+        radial-gradient(circle at 15% 15%, rgba(42, 120, 214, 0.16), transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(12, 163, 12, 0.10), transparent 40%),
+        linear-gradient(160deg, #0f2647, #16325c);
+    }
+
+    .login-card {
+      width: min(400px, 100%);
+      background: var(--surface-2);
+      border-radius: 20px;
+      box-shadow: 0 30px 60px rgba(6, 16, 33, 0.35);
+      padding: 36px 32px;
+    }
+
+    .login-brand {
+      display: flex;
+      align-items: center;
       gap: 12px;
+      margin-bottom: 22px;
     }
 
-    .side-pill {
-      background: rgba(255, 255, 255, 0.72);
-      border: 1px solid rgba(255, 255, 255, 0.65);
-      border-radius: 14px;
-      padding: 13px 14px;
+    .login-brand .mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(145deg, var(--brand), var(--brand-dark));
+      box-shadow: 0 8px 18px rgba(42, 120, 214, 0.35);
     }
 
-    .side-pill b {
-      display: block;
-      margin-bottom: 2px;
-      font-size: 1.05rem;
-      font-family: "Space Grotesk", sans-serif;
-    }
-
-    .side-pill span {
-      color: var(--ink-soft);
-      font-size: 0.9rem;
-    }
-
-    .two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 18px;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      border-radius: var(--radius);
-      box-shadow: 0 10px 26px rgba(31, 37, 32, 0.08);
-      padding: 20px;
-      animation: rise .8s ease;
-    }
-
-    .card h3 {
-      margin: 0 0 8px;
-      font-family: "Space Grotesk", sans-serif;
-      font-size: 1.1rem;
-    }
-
-    .card p,
-    .card li {
-      color: var(--ink-soft);
-      line-height: 1.5;
+    .login-brand h1 {
       margin: 0;
+      font-size: 1.25rem;
+      letter-spacing: -0.3px;
     }
 
-    .card ul {
-      margin: 10px 0 0;
-      padding-left: 18px;
+    .login-brand p {
+      margin: 2px 0 0;
+      font-size: 0.82rem;
+      color: var(--text-muted);
     }
 
-    .mvp {
-      display: grid;
-      grid-template-columns: 360px 1fr;
-      gap: 14px;
+    .login-card h2 {
+      font-size: 1.05rem;
+      margin: 4px 0 18px;
+      color: var(--text-secondary);
+      font-weight: 600;
     }
 
-    .panel {
-      background: #fbf7f0;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 18px;
+    #loginError {
+      display: none;
+      background: var(--status-critical-soft);
+      color: var(--status-critical);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      margin-bottom: 14px;
     }
 
-    .panel h4 {
-      margin: 0 0 8px;
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 0.7px;
-      color: #687463;
+    .login-hint {
+      margin-top: 16px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      background: var(--brand-soft);
+      border-radius: 10px;
+      padding: 10px 12px;
+      line-height: 1.5;
     }
 
+    /* ---------- Shared form controls ---------- */
     label {
       display: block;
-      margin-top: 9px;
+      margin-top: 10px;
       margin-bottom: 5px;
-      font-size: 0.82rem;
-      color: #576356;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
       font-weight: 500;
     }
 
-    input,
-    select,
-    button {
+    input, select {
       width: 100%;
       border-radius: 10px;
-      border: 1px solid #cfc8b8;
-      padding: 10px;
-      font: inherit;
+      border: 1px solid #d7dbe3;
+      padding: 10px 12px;
+      font-size: 0.92rem;
+      background: var(--surface-1);
+      color: var(--text-primary);
     }
 
-    input,
-    select {
-      background: rgba(255, 255, 255, 0.86);
+    input:focus, select:focus {
+      outline: 2px solid var(--brand);
+      outline-offset: 1px;
     }
 
     button {
       cursor: pointer;
       border: none;
-      margin-top: 10px;
+      border-radius: 10px;
+      padding: 11px 14px;
       font-weight: 600;
+      font-size: 0.9rem;
     }
 
+    .btn-block { width: 100%; margin-top: 14px; }
+
     .btn-main {
-      background: linear-gradient(135deg, var(--hero-b), #e85e3b);
+      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
       color: #fff;
-      box-shadow: 0 10px 18px rgba(200, 70, 42, 0.25);
+      box-shadow: 0 10px 18px rgba(42, 120, 214, 0.28);
     }
 
     .btn-alt {
-      background: linear-gradient(135deg, var(--hero-c), #1f8a7e);
+      background: linear-gradient(135deg, var(--status-good), #087a08);
       color: #fff;
-      box-shadow: 0 10px 18px rgba(42, 157, 143, 0.24);
     }
 
     .btn-muted {
       background: #fff;
-      color: #4f5a4d;
-      border: 1px solid #d8d1c2;
+      color: var(--text-secondary);
+      border: 1px solid #d7dbe3;
     }
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
+    .btn-danger {
+      background: var(--status-critical-soft);
+      color: var(--status-critical);
+    }
+
+    /* ---------- App shell ---------- */
+    #appShell {
+      display: none;
+      min-height: 100vh;
+      grid-template-columns: 250px 1fr;
+    }
+
+    #appShell.active { display: grid; }
+
+    .sidebar {
+      background: linear-gradient(180deg, var(--sidebar), var(--sidebar-soft));
+      color: var(--sidebar-ink);
+      padding: 22px 16px;
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
       gap: 10px;
-      margin-bottom: 12px;
+      padding: 0 6px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 14px;
     }
 
-    .stat {
-      background: rgba(255, 255, 255, 0.78);
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      border-radius: 14px;
-      padding: 12px;
+    .sidebar-brand .mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(145deg, var(--brand), #5aa4ec);
+      flex-shrink: 0;
     }
 
-    .stat b {
-      font-family: "Space Grotesk", sans-serif;
-      font-size: 1.5rem;
+    .sidebar-brand h1 {
+      margin: 0;
+      font-size: 1.05rem;
+      color: #fff;
+      letter-spacing: -0.2px;
+    }
+
+    .sidebar-brand p {
+      margin: 1px 0 0;
+      font-size: 0.72rem;
+      color: var(--sidebar-ink-muted);
+    }
+
+    .nav-group {
+      margin-bottom: 6px;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--sidebar-ink-muted);
+      padding: 14px 10px 6px;
+    }
+
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      color: var(--sidebar-ink);
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-weight: 500;
+      font-size: 0.88rem;
+      margin-bottom: 2px;
+    }
+
+    .nav-btn .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--sidebar-ink-muted);
+      flex-shrink: 0;
+    }
+
+    .nav-btn:hover { background: rgba(255,255,255,0.06); }
+
+    .nav-btn.active {
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+    }
+
+    .nav-btn.active .dot { background: #5aa4ec; }
+
+    .sidebar-spacer { flex: 1; }
+
+    .sidebar-user {
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--brand), #5aa4ec);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .sidebar-user-info { flex: 1; min-width: 0; }
+
+    .sidebar-user-info b {
       display: block;
-      margin-bottom: 3px;
+      font-size: 0.85rem;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .stat span {
-      color: var(--ink-soft);
+    .role-badge {
+      display: inline-block;
+      margin-top: 2px;
+      font-size: 0.68rem;
+      padding: 1px 8px;
+      border-radius: 999px;
+      background: rgba(90, 164, 236, 0.22);
+      color: #bcd8f8;
+    }
+
+    #btnLogout {
+      width: 100%;
+      margin-top: 12px;
+      background: rgba(255,255,255,0.06);
+      color: var(--sidebar-ink);
+      font-size: 0.82rem;
+      padding: 9px;
+    }
+
+    #btnLogout:hover { background: rgba(255,255,255,0.12); }
+
+    /* ---------- Main content ---------- */
+    .main {
+      padding: 26px 32px 40px;
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .topbar h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      letter-spacing: -0.3px;
+    }
+
+    .topbar p {
+      margin: 4px 0 0;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+
+    .status-pill {
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .card + .card { margin-top: 16px; }
+
+    .card h3 {
+      margin: 0 0 4px;
+      font-size: 1.02rem;
+    }
+
+    .card .card-sub {
+      margin: 0 0 16px;
+      color: var(--text-muted);
       font-size: 0.82rem;
     }
 
+    /* ---------- Stat tiles ---------- */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .stat {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px 18px;
+    }
+
+    .stat span.label {
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .stat b {
+      font-size: 1.7rem;
+      font-variant-numeric: tabular-nums;
+      display: block;
+      letter-spacing: -0.5px;
+    }
+
+    /* ---------- Risk distribution bars ---------- */
+    .risk-row {
+      display: grid;
+      grid-template-columns: 90px 1fr 70px;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      font-size: 0.85rem;
+    }
+
+    .risk-row:last-child { margin-bottom: 0; }
+
+    .risk-track {
+      height: 10px;
+      border-radius: 999px;
+      background: var(--gridline);
+      overflow: hidden;
+    }
+
+    .risk-track > i { display: block; height: 100%; border-radius: 999px; }
+
+    .risk-count { text-align: right; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+
+    /* ---------- Table ---------- */
+    .table-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .table-toolbar input { max-width: 260px; }
+
     .table-wrap {
       overflow-x: auto;
-      border: 1px solid #ddd6c8;
+      border: 1px solid var(--border);
       border-radius: 12px;
-      background: #fff;
     }
 
     table {
@@ -317,22 +465,24 @@
       min-width: 720px;
     }
 
-    th,
-    td {
-      padding: 11px 10px;
+    th, td {
+      padding: 12px 14px;
       text-align: left;
-      border-bottom: 1px solid #eee6d7;
+      border-bottom: 1px solid var(--gridline);
     }
 
     th {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: #6d7869;
-      background: #fcf8f2;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+      background: #fafbfc;
       position: sticky;
       top: 0;
     }
+
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #fafbfc; }
 
     .pill {
       display: inline-flex;
@@ -344,191 +494,179 @@
       font-weight: 700;
     }
 
-    .pill.alto { background: rgba(196, 69, 54, 0.13); color: var(--bad); }
-    .pill.medio { background: rgba(201, 120, 47, 0.14); color: var(--warn); }
-    .pill.bajo { background: rgba(45, 147, 108, 0.14); color: var(--ok); }
+    .pill.alto { background: var(--status-critical-soft); color: var(--status-critical); }
+    .pill.medio { background: var(--status-warning-soft); color: var(--status-warning); }
+    .pill.bajo { background: var(--status-good-soft); color: var(--status-good); }
 
     .bar {
       width: 100%;
       height: 6px;
       border-radius: 999px;
-      background: #ece4d5;
+      background: var(--gridline);
       overflow: hidden;
       margin-top: 6px;
     }
 
-    .bar > i {
-      display: block;
-      height: 100%;
+    .bar > i { display: block; height: 100%; }
+
+    .small { color: var(--text-muted); font-size: 0.8rem; }
+
+    .two-col-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 16px;
     }
 
     .log {
-      margin-top: 10px;
+      margin-top: 12px;
       border-radius: 10px;
-      border: 1px solid #d2cbbd;
-      background: #fff;
+      border: 1px solid var(--border);
+      background: var(--surface-1);
       color: #405048;
-      height: 170px;
+      height: 160px;
       overflow: auto;
-      padding: 10px;
+      padding: 10px 12px;
       font-size: 0.79rem;
       white-space: pre-wrap;
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
 
-    .small {
-      color: #62705f;
-      font-size: 0.8rem;
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
     }
 
-    @keyframes rise {
-      from {
-        opacity: 0;
-        transform: translateY(14px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    hr.sep {
+      border: none;
+      border-top: 1px solid var(--gridline);
+      margin: 16px 0;
     }
 
-    @media (max-width: 1020px) {
-      .hero-grid,
-      .mvp,
-      .two-col {
-        grid-template-columns: 1fr;
-      }
+    [hidden] { display: none !important; }
 
-      .stats {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      header {
-        padding: 20px 18px;
-      }
-
-      .container {
-        width: min(1280px, calc(100% - 20px));
-      }
+    @media (max-width: 980px) {
+      #appShell { grid-template-columns: 1fr; }
+      .sidebar { position: relative; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; }
+      .sidebar-brand { border-bottom: none; margin-bottom: 0; padding: 0 10px 0 0; }
+      .sidebar-spacer { display: none; }
+      .sidebar-user { border-top: none; margin-left: auto; }
+      .nav-group { display: none; }
+      .main { padding: 20px; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .two-col-form, .settings-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <div class="noise"></div>
-  <header>
-    <div class="brand">
-      <div class="brand-mark"></div>
-      <div>
-        <h1>HemoPuno MVP</h1>
-        <p>Seguimiento nutricional automatizado con IA para postas rurales de Puno</p>
+
+  <!-- ============ LOGIN ============ -->
+  <div id="loginScreen">
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="mark"></div>
+        <div>
+          <h1>anemia_zero</h1>
+          <p>Plataforma de seguimiento de anemia infantil</p>
+        </div>
+      </div>
+      <h2>Inicia sesión para continuar</h2>
+      <div id="loginError"></div>
+      <form id="loginForm">
+        <label for="loginUsername">Usuario</label>
+        <input id="loginUsername" autocomplete="username" required>
+        <label for="loginPassword">Contraseña</label>
+        <input id="loginPassword" type="password" autocomplete="current-password" required>
+        <button type="submit" class="btn-main btn-block" id="loginSubmitBtn">Ingresar</button>
+      </form>
+      <div class="login-hint">
+        Cuentas demo: <strong>admin / anemia2026</strong> (administración) y <strong>promotor / anemia2026</strong> (personal de salud).
       </div>
     </div>
-    <div class="status" id="botState">Telegram: no verificado</div>
-  </header>
+  </div>
 
-  <main class="container">
-    <section class="hero">
-      <div class="hero-grid">
-        <div class="hero-content">
-          <span class="eyebrow">Hackatón · Solución ODS 3</span>
-          <h2>De la entrega de chispitas al acompañamiento inteligente y continuo</h2>
-          <p>
-            La plataforma convierte un seguimiento reactivo en una intervención proactiva: predice riesgo de abandono,
-            prioriza familias críticas y activa mensajes culturalmente adaptados para sostener el tratamiento contra la anemia infantil.
-          </p>
-        </div>
-        <aside class="hero-side">
-          <div class="side-pill">
-            <b>Problema clave</b>
-            <span>Brecha de adopción por barreras socioculturales y falta de acompañamiento.</span>
-          </div>
-          <div class="side-pill">
-            <b>Usuario directo</b>
-            <span>Personal médico y promotores de salud de postas en Puno.</span>
-          </div>
-          <div class="side-pill">
-            <b>Impacto esperado</b>
-            <span>Menor deserción del tratamiento y mejora de hemoglobina en menores de 3 años.</span>
-          </div>
-        </aside>
-      </div>
-    </section>
-
-    <section class="two-col">
-      <article class="card">
-        <h3>Funcionamiento de la solución</h3>
-        <ul>
-          <li><strong>Arquitectura y gestión:</strong> Web app con Node.js + base de datos PostgreSQL para registro clínico estructurado.</li>
-          <li><strong>Modelo predictivo:</strong> Un score tabular clasifica el riesgo de abandono en bajo, medio o alto.</li>
-          <li><strong>Acompañamiento multiagente:</strong> Mensajería automatizada por Telegram con lenguaje contextual y recomendaciones locales.</li>
-        </ul>
-      </article>
-      <article class="card">
-        <h3>Sostenibilidad y escalabilidad</h3>
-        <ul>
-          <li><strong>Modelo inicial B2G:</strong> acuerdos con MINSA, DIRESA y gobiernos locales.</li>
-          <li><strong>Financiamiento:</strong> postulación a grants de salud digital e innovación social.</li>
-          <li><strong>Escala:</strong> empaquetable como SaaS o marca blanca para ONGs y clínicas privadas.</li>
-        </ul>
-      </article>
-    </section>
-
-    <section class="card">
-      <h3>MVP Operativo</h3>
-      <div class="mvp">
-        <div class="panel">
-          <h4>Registrar niño</h4>
-          <label for="f_nombre">Nombre del niño</label>
-          <input id="f_nombre" placeholder="Ej. Mayra Q.">
-
-          <label for="f_edad">Edad (meses)</label>
-          <input id="f_edad" type="number" value="18">
-
-          <label for="f_hb">Hemoglobina (g/dL)</label>
-          <input id="f_hb" type="number" step="0.1" value="10.2">
-
-          <label for="f_km">Distancia a la posta (km)</label>
-          <input id="f_km" type="number" step="0.5" value="6">
-
-          <label for="f_om">Dosis omitidas último mes</label>
-          <input id="f_om" type="number" value="3">
-
-          <label for="f_idioma">Idioma del hogar</label>
-          <select id="f_idioma">
-            <option>Quechua</option>
-            <option>Aymara</option>
-            <option>Español</option>
-          </select>
-
-          <label for="f_chat">Chat ID de Telegram del cuidador</label>
-          <input id="f_chat" placeholder="Ej. 123456789">
-
-          <button class="btn-main" id="btnRegistrar">Calcular riesgo y registrar</button>
-          <button class="btn-muted" id="btnDemo">Cargar demo</button>
-
-          <hr style="border:none;border-top:1px solid #ddd6c8;margin:14px 0 10px">
-
-          <h4>Conexión BotFather</h4>
-          <label for="bot_token">Token del bot (opcional para demo)</label>
-          <input id="bot_token" placeholder="123456:AA...">
-
-          <label for="webhook_url">Base URL pública para webhook</label>
-          <input id="webhook_url" placeholder="https://tu-dominio-o-ngrok.app">
-
-          <button class="btn-alt" id="btnProbarBot">Probar getMe</button>
-          <button class="btn-muted" id="btnWebhook">Configurar webhook</button>
-          <p class="small">Si no hay token, el sistema funciona en modo simulación para hackatón.</p>
-          <div class="log" id="log">[sistema] esperando eventos...</div>
-        </div>
-
+  <!-- ============ APP SHELL ============ -->
+  <div id="appShell">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="mark"></div>
         <div>
-          <div class="stats">
-            <div class="stat"><b id="s_total">0</b><span>Niños monitoreados</span></div>
-            <div class="stat"><b id="s_alto" style="color:var(--bad)">0</b><span>Riesgo alto</span></div>
-            <div class="stat"><b id="s_hb">-</b><span>Hb promedio</span></div>
-            <div class="stat"><b id="s_msg">0</b><span>Mensajes enviados</span></div>
-          </div>
+          <h1>anemia_zero</h1>
+          <p>Panel de salud · Puno</p>
+        </div>
+      </div>
 
+      <div class="nav-group">Navegación</div>
+      <button class="nav-btn" data-view="overview"><span class="dot"></span>Resumen</button>
+      <button class="nav-btn" data-view="patients"><span class="dot"></span>Pacientes</button>
+      <button class="nav-btn" data-view="register" data-role="admin,promotor"><span class="dot"></span>Registrar paciente</button>
+      <button class="nav-btn" data-view="settings" data-role="admin"><span class="dot"></span>Configuración Telegram</button>
+
+      <div class="sidebar-spacer"></div>
+
+      <div class="sidebar-user">
+        <div class="avatar" id="sidebarInitials">--</div>
+        <div class="sidebar-user-info">
+          <b id="sidebarName">-</b>
+          <span class="role-badge" id="sidebarRole">-</span>
+        </div>
+      </div>
+      <button id="btnLogout">Cerrar sesión</button>
+    </aside>
+
+    <main class="main">
+      <!-- ---- Overview ---- -->
+      <section class="view" id="view-overview">
+        <div class="topbar">
+          <div>
+            <h2>Resumen operativo</h2>
+            <p>Estado general del seguimiento de anemia infantil en tiempo real.</p>
+          </div>
+          <div class="status-pill" id="botState">Telegram: no verificado</div>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><span class="label">Niños monitoreados</span><b id="s_total">0</b></div>
+          <div class="stat"><span class="label">Riesgo alto</span><b id="s_alto" style="color:var(--status-critical)">0</b></div>
+          <div class="stat"><span class="label">Hb promedio (g/dL)</span><b id="s_hb">-</b></div>
+          <div class="stat"><span class="label">Mensajes enviados</span><b id="s_msg">0</b></div>
+        </div>
+
+        <div class="card">
+          <h3>Distribución de riesgo</h3>
+          <p class="card-sub">Proporción de pacientes según score de abandono del tratamiento.</p>
+          <div id="riskDistribution"></div>
+        </div>
+
+        <div class="card">
+          <h3>Pacientes prioritarios</h3>
+          <p class="card-sub">Los 5 casos con mayor riesgo de abandono, para intervención inmediata.</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Niño</th><th>Edad</th><th>Hb</th><th>Riesgo</th><th>Idioma</th></tr>
+              </thead>
+              <tbody id="tbodyPriority"></tbody>
+            </table>
+          </div>
+          <p class="small" id="vacioPriority" style="margin-top:8px">Sin pacientes registrados aún.</p>
+        </div>
+      </section>
+
+      <!-- ---- Patients ---- -->
+      <section class="view" id="view-patients">
+        <div class="topbar">
+          <div>
+            <h2>Pacientes</h2>
+            <p>Listado completo, priorizado por score de riesgo de abandono.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="table-toolbar">
+            <input id="patientSearch" placeholder="Buscar por nombre o idioma...">
+            <span class="small" id="patientCount">0 pacientes</span>
+          </div>
           <div class="table-wrap">
             <table>
               <thead>
@@ -546,23 +684,100 @@
           </div>
           <p class="small" id="vacio" style="margin-top:8px">Sin pacientes registrados aún.</p>
         </div>
-      </div>
-    </section>
-  </main>
+      </section>
+
+      <!-- ---- Register ---- -->
+      <section class="view" id="view-register" data-role="admin,promotor">
+        <div class="topbar">
+          <div>
+            <h2>Registrar niño</h2>
+            <p>Calcula el score de riesgo y guarda el registro clínico.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="two-col-form">
+            <div>
+              <label for="f_nombre">Nombre del niño</label>
+              <input id="f_nombre" placeholder="Ej. Mayra Q.">
+
+              <label for="f_edad">Edad (meses)</label>
+              <input id="f_edad" type="number" value="18">
+
+              <label for="f_hb">Hemoglobina (g/dL)</label>
+              <input id="f_hb" type="number" step="0.1" value="10.2">
+            </div>
+            <div>
+              <label for="f_km">Distancia a la posta (km)</label>
+              <input id="f_km" type="number" step="0.5" value="6">
+
+              <label for="f_om">Dosis omitidas último mes</label>
+              <input id="f_om" type="number" value="3">
+
+              <label for="f_idioma">Idioma del hogar</label>
+              <select id="f_idioma">
+                <option>Quechua</option>
+                <option>Aymara</option>
+                <option>Español</option>
+              </select>
+            </div>
+          </div>
+
+          <label for="f_chat">Chat ID de Telegram del cuidador (opcional)</label>
+          <input id="f_chat" placeholder="Ej. 123456789">
+
+          <button class="btn-main" id="btnRegistrar" style="margin-top:14px">Calcular riesgo y registrar</button>
+          <button class="btn-muted" id="btnDemo">Cargar datos demo</button>
+        </div>
+      </section>
+
+      <!-- ---- Settings ---- -->
+      <section class="view" id="view-settings" data-role="admin">
+        <div class="topbar">
+          <div>
+            <h2>Configuración de Telegram</h2>
+            <p>Conecta el bot creado con BotFather y configura el webhook.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="settings-grid">
+            <div>
+              <label for="bot_token">Token del bot (opcional si ya está en el servidor)</label>
+              <input id="bot_token" placeholder="123456:AA...">
+              <button class="btn-alt" id="btnProbarBot" style="margin-top:10px">Probar getMe</button>
+            </div>
+            <div>
+              <label for="webhook_url">Base URL pública para webhook</label>
+              <input id="webhook_url" placeholder="https://tu-dominio-o-ngrok.app">
+              <button class="btn-muted" id="btnWebhook" style="margin-top:10px">Configurar webhook</button>
+            </div>
+          </div>
+          <p class="small" style="margin-top:12px">Si no hay token configurado, el sistema funciona en modo simulación para demo.</p>
+          <hr class="sep">
+          <h3 style="margin-bottom:6px">Registro de eventos</h3>
+          <div class="log" id="log">[sistema] esperando eventos...</div>
+        </div>
+      </section>
+    </main>
+  </div>
 
   <script>
     const state = {
-      patients: []
+      user: null,
+      patients: [],
+      currentView: "overview"
     };
 
     function levelColor(level) {
-      if (level === "alto") return "var(--bad)";
-      if (level === "medio") return "var(--warn)";
-      return "var(--ok)";
+      if (level === "alto") return "var(--status-critical)";
+      if (level === "medio") return "var(--status-warning)";
+      return "var(--status-good)";
     }
 
     function log(message) {
       const el = document.getElementById("log");
+      if (!el) return;
       el.textContent += `\n> ${message}`;
       el.scrollTop = el.scrollHeight;
     }
@@ -572,9 +787,97 @@
         headers: { "Content-Type": "application/json" },
         ...options
       });
-      return response.json();
+      const data = await response.json().catch(() => ({ ok: false, error: "Respuesta invalida" }));
+      if (response.status === 401 && path !== "/api/auth/me" && path !== "/api/auth/login") {
+        showLogin();
+      }
+      return data;
     }
 
+    // ---------- Auth ----------
+    function initials(name) {
+      return (name || "?")
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0].toUpperCase())
+        .join("");
+    }
+
+    function applyRoleVisibility() {
+      const role = state.user ? state.user.role : null;
+      document.querySelectorAll("[data-role]").forEach((el) => {
+        const allowed = el.getAttribute("data-role").split(",");
+        el.style.display = allowed.includes(role) ? "" : "none";
+      });
+    }
+
+    function showLogin() {
+      state.user = null;
+      document.getElementById("appShell").classList.remove("active");
+      document.getElementById("loginScreen").style.display = "flex";
+      document.getElementById("loginError").style.display = "none";
+      document.getElementById("loginForm").reset();
+    }
+
+    function showApp() {
+      document.getElementById("loginScreen").style.display = "none";
+      document.getElementById("appShell").classList.add("active");
+      document.getElementById("sidebarName").textContent = state.user.name;
+      document.getElementById("sidebarRole").textContent = state.user.role === "admin" ? "Administración" : "Promotor de salud";
+      document.getElementById("sidebarInitials").textContent = initials(state.user.name);
+      applyRoleVisibility();
+      switchView("overview");
+      refreshAll();
+    }
+
+    async function checkSession() {
+      const result = await api("/api/auth/me");
+      if (result.ok) {
+        state.user = result.data;
+        showApp();
+      } else {
+        showLogin();
+      }
+    }
+
+    async function handleLogin(event) {
+      event.preventDefault();
+      const username = document.getElementById("loginUsername").value.trim();
+      const password = document.getElementById("loginPassword").value;
+      const errorBox = document.getElementById("loginError");
+      const result = await api("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ username, password })
+      });
+
+      if (!result.ok) {
+        errorBox.textContent = result.error || "No se pudo iniciar sesión";
+        errorBox.style.display = "block";
+        return;
+      }
+
+      state.user = result.data;
+      showApp();
+    }
+
+    async function handleLogout() {
+      await api("/api/auth/logout", { method: "POST" });
+      showLogin();
+    }
+
+    // ---------- Views ----------
+    function switchView(view) {
+      state.currentView = view;
+      document.querySelectorAll(".view").forEach((section) => {
+        section.classList.toggle("active", section.id === `view-${view}`);
+      });
+      document.querySelectorAll(".nav-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.view === view);
+      });
+    }
+
+    // ---------- Data ----------
     function getFormPatient() {
       return {
         nombre: document.getElementById("f_nombre").value.trim() || "Sin nombre",
@@ -587,9 +890,30 @@
       };
     }
 
+    function patientRow(p) {
+      const color = levelColor(p.riskLevel);
+      return `
+        <tr>
+          <td><strong>${p.nombre}</strong><br><span class="small">${p.km} km de la posta</span></td>
+          <td>${p.edad} m</td>
+          <td>${Number(p.hb).toFixed(1)}</td>
+          <td>
+            <span class="pill ${p.riskLevel}">${p.riskScore}% ${p.riskLevel}</span>
+            <div class="bar"><i style="width:${p.riskScore}%;background:${color}"></i></div>
+          </td>
+          <td>${p.idioma}</td>
+        </tr>
+      `;
+    }
+
     function renderPatients() {
+      const query = (document.getElementById("patientSearch").value || "").toLowerCase();
+      const filtered = state.patients.filter((p) =>
+        p.nombre.toLowerCase().includes(query) || p.idioma.toLowerCase().includes(query)
+      );
+
       const tbody = document.getElementById("tbody");
-      tbody.innerHTML = state.patients.map((p) => {
+      tbody.innerHTML = filtered.map((p) => {
         const color = levelColor(p.riskLevel);
         return `
           <tr>
@@ -606,7 +930,36 @@
         `;
       }).join("");
 
-      document.getElementById("vacio").style.display = state.patients.length ? "none" : "block";
+      document.getElementById("vacio").style.display = filtered.length ? "none" : "block";
+      document.getElementById("patientCount").textContent = `${filtered.length} pacientes`;
+    }
+
+    function renderPriority() {
+      const top = [...state.patients].sort((a, b) => b.riskScore - a.riskScore).slice(0, 5);
+      document.getElementById("tbodyPriority").innerHTML = top.map(patientRow).join("");
+      document.getElementById("vacioPriority").style.display = top.length ? "none" : "block";
+    }
+
+    function renderRiskDistribution() {
+      const total = state.patients.length;
+      const levels = [
+        { key: "alto", label: "Alto", color: "var(--status-critical)" },
+        { key: "medio", label: "Medio", color: "var(--status-warning)" },
+        { key: "bajo", label: "Bajo", color: "var(--status-good)" }
+      ];
+
+      const container = document.getElementById("riskDistribution");
+      container.innerHTML = levels.map((lvl) => {
+        const count = state.patients.filter((p) => p.riskLevel === lvl.key).length;
+        const pct = total ? Math.round((count / total) * 100) : 0;
+        return `
+          <div class="risk-row">
+            <span>${lvl.label}</span>
+            <div class="risk-track"><i style="width:${pct}%;background:${lvl.color}"></i></div>
+            <span class="risk-count">${count} (${pct}%)</span>
+          </div>
+        `;
+      }).join("");
     }
 
     async function refreshStats() {
@@ -623,7 +976,13 @@
       if (result.ok) {
         state.patients = result.data;
         renderPatients();
+        renderPriority();
+        renderRiskDistribution();
       }
+    }
+
+    async function refreshAll() {
+      await Promise.all([refreshPatients(), refreshStats()]);
     }
 
     async function registerPatient() {
@@ -640,8 +999,7 @@
 
       const { patient, prediction } = result.data;
       log(`registro: ${patient.nombre} -> ${prediction.score}% (${prediction.level})`);
-      await refreshPatients();
-      await refreshStats();
+      await refreshAll();
     }
 
     async function sendFollowup(patientId) {
@@ -652,7 +1010,8 @@
         return;
       }
 
-      const token = document.getElementById("bot_token").value.trim();
+      const tokenField = document.getElementById("bot_token");
+      const token = tokenField ? tokenField.value.trim() : "";
       const result = await api("/api/messages/send", {
         method: "POST",
         body: JSON.stringify({
@@ -668,7 +1027,7 @@
         const mode = result.simulated ? "simulado" : "real";
         log(`mensaje ${mode} enviado a ${patient.nombre}`);
       } else {
-        log("fallo enviando mensaje por Telegram");
+        log(result.error || "fallo enviando mensaje por Telegram");
       }
 
       await refreshStats();
@@ -681,12 +1040,13 @@
         body: JSON.stringify({ token })
       });
 
+      const pill = document.getElementById("botState");
       if (result.ok && result.result) {
-        document.getElementById("botState").textContent = `Telegram: @${result.result.username} conectado`;
+        pill.textContent = `Telegram: @${result.result.username} conectado`;
         log(`bot conectado como @${result.result.username}`);
       } else {
-        document.getElementById("botState").textContent = "Telegram: modo simulación";
-        log(result.description || "no se pudo conectar con Telegram");
+        pill.textContent = "Telegram: modo simulación";
+        log(result.description || result.error || "no se pudo conectar con Telegram");
       }
     }
 
@@ -701,7 +1061,7 @@
       if (result.ok) {
         log(`webhook configurado: ${result.configuredWebhook}`);
       } else {
-        log(result.description || "no se pudo configurar webhook");
+        log(result.description || result.error || "no se pudo configurar webhook");
       }
     }
 
@@ -722,19 +1082,24 @@
       }
 
       log("datos demo cargados");
-      await refreshPatients();
-      await refreshStats();
+      await refreshAll();
     }
 
-    async function initialize() {
+    function initialize() {
+      document.getElementById("loginForm").addEventListener("submit", handleLogin);
+      document.getElementById("btnLogout").addEventListener("click", handleLogout);
+
+      document.querySelectorAll(".nav-btn").forEach((btn) => {
+        btn.addEventListener("click", () => switchView(btn.dataset.view));
+      });
+
       document.getElementById("btnRegistrar").addEventListener("click", registerPatient);
+      document.getElementById("btnDemo").addEventListener("click", seedDemo);
       document.getElementById("btnProbarBot").addEventListener("click", testTelegram);
       document.getElementById("btnWebhook").addEventListener("click", setupWebhook);
-      document.getElementById("btnDemo").addEventListener("click", seedDemo);
+      document.getElementById("patientSearch").addEventListener("input", renderPatients);
 
-      await refreshPatients();
-      await refreshStats();
-      log("panel listo");
+      checkSession();
     }
 
     initialize();
