@@ -1,0 +1,4 @@
+node_modules
+.env
+TB_DIGTEL_ANEMIA_ATENDIDOS.csv
+scripts/*.geojson

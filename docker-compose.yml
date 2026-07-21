@@ -12,9 +12,6 @@ services:
       DB_USER: anemia_zero
       DB_PASSWORD: anemia_zero
       DB_NAME: anemia_zero
-      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
-      TELEGRAM_WEBHOOK_SECRET: ${TELEGRAM_WEBHOOK_SECRET:-hackathon-secret}
-      TELEGRAM_ALLOW_SIMULATION: ${TELEGRAM_ALLOW_SIMULATION:-true}
       SESSION_SECRET: ${SESSION_SECRET:-cambia-este-secreto-en-produccion}
     depends_on:
       - db

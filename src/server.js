@@ -3,20 +3,23 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 
-const { port, appBaseUrl, telegram, session: sessionConfig } = require("./config");
+const { port, session: sessionConfig } = require("./config");
 const {
   initDb,
   getPatients,
   createPatient,
-  createOutboundMessage,
   getStats,
   getUserByUsername,
-  getPatientsByDepartment
+  getPatientsByDepartment,
+  getProvinciasPuno,
+  createAyuda,
+  getAyudas
 } = require("./db");
 const { calculateRiskScore } = require("./riskModel");
-const telegramService = require("./services/telegram");
 const anemiaAnalytics = require("./data/anemia_analytics.json");
 const peruDepartments = require("./data/peru_departments.json");
+const punoProvinces = require("./data/puno_provinces.json");
+const referenciaSalud = require("./data/referencia_salud.json");
 const {
   verifyPassword,
   createSession,
@@ -32,6 +35,12 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(express.static(path.join(__dirname, "..")));
+
+let dbReady = null;
+app.use((req, res, next) => {
+  if (!dbReady) dbReady = initDb();
+  dbReady.then(() => next()).catch(next);
+});
 
 app.get("/api/health", async (req, res) => {
   res.json({
@@ -122,6 +131,23 @@ app.get("/api/geo/patients-by-department", requireAuth, async (req, res, next) =
   }
 });
 
+app.get("/api/geo/puno-provinces", requireAuth, (req, res) => {
+  res.json({ ok: true, data: punoProvinces });
+});
+
+app.get("/api/geo/puno-provincias-datos", requireAuth, async (req, res, next) => {
+  try {
+    const rows = await getProvinciasPuno();
+    res.json({ ok: true, data: rows });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/api/referencia/salud", requireAuth, (req, res) => {
+  res.json({ ok: true, data: referenciaSalud });
+});
+
 app.get("/api/stats", requireAuth, async (req, res, next) => {
   try {
     const stats = await getStats();
@@ -160,88 +186,34 @@ app.post("/api/patients", requireAuth, requireRole("admin", "promotor"), async (
   }
 });
 
-app.post("/api/messages/send", requireAuth, requireRole("admin", "promotor"), async (req, res, next) => {
+app.get("/api/ayudas", requireAuth, async (req, res, next) => {
   try {
-    const { patientId, chatId, nombre, riskLevel, token } = req.body || {};
-    if (!chatId) {
-      return res.status(400).json({ ok: false, error: "chatId es obligatorio" });
+    const rows = await getAyudas();
+    res.json({ ok: true, data: rows });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/api/ayudas", requireAuth, requireRole("admin"), async (req, res, next) => {
+  try {
+    const { departamento, provincia, tipo, nota } = req.body || {};
+    if (!departamento || !tipo) {
+      return res.status(400).json({ ok: false, error: "Departamento y tipo de ayuda son obligatorios" });
     }
 
-    const templateFn = telegramService.templates[riskLevel] || telegramService.templates.medio;
-    const text = templateFn(nombre || "el niño");
-
-    const providerResponse = await telegramService.sendMessage({
-      token,
-      chatId,
-      text
+    const ayuda = await createAyuda({
+      departamento: String(departamento).toUpperCase(),
+      provincia: provincia ? String(provincia).toUpperCase() : null,
+      tipo,
+      nota: nota || "",
+      enviadoPor: req.session.name
     });
 
-    const status = providerResponse.ok ? "sent" : "failed";
-
-    const message = await createOutboundMessage({
-      patientId,
-      channel: "telegram",
-      text,
-      status,
-      providerMessageId: providerResponse.result?.message_id ? String(providerResponse.result.message_id) : null,
-      providerResponse
-    });
-
-    return res.json({
-      ok: providerResponse.ok,
-      simulated: providerResponse.simulated || false,
-      data: {
-        message,
-        providerResponse
-      }
-    });
+    return res.status(201).json({ ok: true, data: ayuda });
   } catch (error) {
     return next(error);
   }
-});
-
-app.post("/api/telegram/get-me", requireAuth, requireRole("admin"), async (req, res, next) => {
-  try {
-    const { token } = req.body || {};
-    const response = await telegramService.getMe(token);
-    res.json(response);
-  } catch (error) {
-    next(error);
-  }
-});
-
-app.post("/api/telegram/set-webhook", requireAuth, requireRole("admin"), async (req, res, next) => {
-  try {
-    const { token, webhookBaseUrl } = req.body || {};
-    const response = await telegramService.setWebhook({
-      token,
-      webhookBaseUrl: webhookBaseUrl || appBaseUrl
-    });
-    res.json(response);
-  } catch (error) {
-    next(error);
-  }
-});
-
-app.post("/api/telegram/webhook", async (req, res) => {
-  const secret = req.query.secret;
-  if (secret !== telegram.webhookSecret) {
-    return res.status(401).json({ ok: false, error: "Webhook no autorizado" });
-  }
-
-  const messageText = req.body?.message?.text;
-  const fromId = req.body?.message?.from?.id;
-
-  if (messageText && fromId && telegram.token) {
-    if (messageText.toLowerCase() === "ok") {
-      await telegramService.sendMessage({
-        chatId: fromId,
-        text: "Gracias por confirmar. Seguimos acompanando el tratamiento."
-      });
-    }
-  }
-
-  return res.json({ ok: true });
 });
 
 app.use((error, req, res, next) => {
@@ -253,14 +225,12 @@ app.use((error, req, res, next) => {
   });
 });
 
-async function bootstrap() {
-  await initDb();
+// Solo abre un puerto cuando se ejecuta directamente (node src/server.js, npm start, Docker).
+// En Vercel este archivo se importa como funcion serverless: no debe llamar a listen().
+if (require.main === module) {
   app.listen(port, () => {
     console.log(`anemia_zero corriendo en http://localhost:${port}`);
   });
 }
 
-bootstrap().catch((error) => {
-  console.error("No se pudo iniciar la aplicacion", error);
-  process.exit(1);
-});
+module.exports = app;

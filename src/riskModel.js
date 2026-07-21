@@ -41,7 +41,7 @@ function calculateRiskScore(input) {
       "Mensajeria diaria en idioma del hogar"
     ],
     medio: [
-      "Recordatorio cada 48 horas por Telegram",
+      "Recordatorio cada 48 horas por el promotor de salud",
       "Resolver dudas sobre efectos secundarios",
       "Reforzar receta local con hierro"
     ],

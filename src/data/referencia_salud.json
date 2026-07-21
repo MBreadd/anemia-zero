@@ -1,0 +1,27 @@
+{
+  "fuente": "INEI - ENDES 2023 (Encuesta Demográfica y de Salud Familiar), prevalencia de anemia en niños y niñas de 6 a 35 meses",
+  "anio": 2023,
+  "promedioNacional": 43.1,
+  "promedioNacionalAnioAnterior": 42.4,
+  "rankingDepartamentos": [
+    { "departamento": "PUNO", "prevalencia": 70.4 },
+    { "departamento": "UCAYALI", "prevalencia": 59.4 },
+    { "departamento": "MADRE DE DIOS", "prevalencia": 58.3 },
+    { "departamento": "LORETO", "prevalencia": 58.1 },
+    { "departamento": "HUANCAVELICA", "prevalencia": 56.6 }
+  ],
+  "notaRanking": "Los 5 departamentos con mayor prevalencia reportados públicamente en la cobertura de prensa de ENDES 2023; no se incluyen los 20 departamentos restantes por no contar con una fuente primaria verificada para cada uno.",
+  "puno": {
+    "poblacionDepartamento2017": 1172697,
+    "poblacionDepartamento2023Proyectada": 1217951,
+    "fuentePoblacion": "INEI, Censos Nacionales 2017 y proyecciones poblacionales 2023",
+    "numeroProvincias": 13,
+    "prevalenciaAnemia6a35meses": 70.4,
+    "notaPrevalencia": "La más alta entre los 24 departamentos y la Provincia Constitucional del Callao, según ENDES 2023."
+  },
+  "sources": [
+    { "titulo": "Anemia infantil aumenta a 43,1% a nivel nacional, según última ENDES 2023 — Perú21", "url": "https://peru21.pe/lima/anemia-infantil-aumenta-a-431-a-nivel-nacional-segun-ultima-endes-2023-anemia-anemia-infantil-ninos-con-anemia-endes-2023-noticia/" },
+    { "titulo": "Puno: 70% de los niños de tres años padece de anemia, según encuesta Endes 2024 — Infobae", "url": "https://www.infobae.com/peru/2024/03/20/puno-70-de-los-ninos-de-tres-anos-padece-de-anemia-segun-encuesta-endes-2024/" },
+    { "titulo": "Censos 2017: departamento de Puno tiene 1 172 697 habitantes — INEI", "url": "https://censo2017.inei.gob.pe/censos-2017-departamento-de-puno-tiene-1-172-697-habitantes/" }
+  ]
+}

@@ -1,21 +1,20 @@
 const { Pool } = require("pg");
 const { db } = require("./config");
 const { hashPassword } = require("./auth");
+const { computeVulnerability } = require("./predictiveModel");
 
-const pool = new Pool({
-  host: db.host,
-  port: db.port,
-  user: db.user,
-  password: db.password,
-  database: db.database
-});
+const pool = new Pool(
+  db.connectionString
+    ? { connectionString: db.connectionString, ssl: db.ssl }
+    : { host: db.host, port: db.port, user: db.user, password: db.password, database: db.database }
+);
 
 let memoryMode = false;
 let patientCounter = 1;
-let messageCounter = 1;
+let ayudaCounter = 1;
 let userCounter = 1;
 const memoryPatients = [];
-const memoryMessages = [];
+const memoryAyudas = [];
 const memoryUsers = [];
 
 const DEFAULT_USERS = [
@@ -36,6 +35,7 @@ async function initDb() {
         idioma TEXT NOT NULL,
         chat_id TEXT,
         departamento TEXT NOT NULL DEFAULT 'PUNO',
+        provincia TEXT,
         risk_score INTEGER NOT NULL,
         risk_level TEXT NOT NULL,
         created_at TIMESTAMP NOT NULL DEFAULT NOW()
@@ -43,19 +43,21 @@ async function initDb() {
     `);
 
     await pool.query(`ALTER TABLE patients ADD COLUMN IF NOT EXISTS departamento TEXT NOT NULL DEFAULT 'PUNO';`);
+    await pool.query(`ALTER TABLE patients ADD COLUMN IF NOT EXISTS provincia TEXT;`);
 
     await pool.query(`
-      CREATE TABLE IF NOT EXISTS outbound_messages (
+      CREATE TABLE IF NOT EXISTS ayudas (
         id BIGSERIAL PRIMARY KEY,
-        patient_id BIGINT REFERENCES patients(id) ON DELETE CASCADE,
-        channel TEXT NOT NULL,
-        text TEXT NOT NULL,
-        status TEXT NOT NULL,
-        provider_message_id TEXT,
-        provider_response JSONB,
+        departamento TEXT NOT NULL,
+        provincia TEXT,
+        tipo TEXT NOT NULL,
+        nota TEXT,
+        enviado_por TEXT NOT NULL,
         created_at TIMESTAMP NOT NULL DEFAULT NOW()
       );
     `);
+
+    await pool.query(`ALTER TABLE ayudas ADD COLUMN IF NOT EXISTS provincia TEXT;`);
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
@@ -137,7 +139,7 @@ async function getPatients() {
 
   const result = await pool.query(`
     SELECT id, nombre, edad, hb::float8 AS hb, km::float8 AS km, omitidas, idioma,
-           chat_id AS "chatId", departamento, risk_score AS "riskScore", risk_level AS "riskLevel",
+           chat_id AS "chatId", departamento, provincia, risk_score AS "riskScore", risk_level AS "riskLevel",
            created_at AS "createdAt"
     FROM patients
     ORDER BY risk_score DESC, created_at DESC
@@ -147,6 +149,7 @@ async function getPatients() {
 
 async function createPatient(patient) {
   const departamento = String(patient.departamento || "PUNO").toUpperCase();
+  const provincia = departamento === "PUNO" && patient.provincia ? String(patient.provincia).toUpperCase() : null;
 
   if (memoryMode) {
     const createdPatient = {
@@ -159,6 +162,7 @@ async function createPatient(patient) {
       idioma: patient.idioma,
       chatId: patient.chatId || null,
       departamento,
+      provincia,
       riskScore: Number(patient.riskScore),
       riskLevel: patient.riskLevel,
       createdAt: new Date().toISOString()
@@ -169,10 +173,10 @@ async function createPatient(patient) {
 
   const result = await pool.query(
     `
-      INSERT INTO patients (nombre, edad, hb, km, omitidas, idioma, chat_id, departamento, risk_score, risk_level)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+      INSERT INTO patients (nombre, edad, hb, km, omitidas, idioma, chat_id, departamento, provincia, risk_score, risk_level)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
       RETURNING id, nombre, edad, hb::float8 AS hb, km::float8 AS km, omitidas, idioma,
-                chat_id AS "chatId", departamento, risk_score AS "riskScore", risk_level AS "riskLevel",
+                chat_id AS "chatId", departamento, provincia, risk_score AS "riskScore", risk_level AS "riskLevel",
                 created_at AS "createdAt"
     `,
     [
@@ -184,6 +188,7 @@ async function createPatient(patient) {
       patient.idioma,
       patient.chatId || null,
       departamento,
+      provincia,
       patient.riskScore,
       patient.riskLevel
     ]
@@ -198,73 +203,131 @@ async function getPatientsByDepartment() {
   for (const patient of patients) {
     const key = patient.departamento || "PUNO";
     if (!byDept[key]) {
-      byDept[key] = { departamento: key, total: 0, alto: 0, medio: 0, bajo: 0, hbSum: 0 };
+      byDept[key] = { departamento: key, total: 0, alto: 0, medio: 0, bajo: 0, hbSum: 0, riskScoreSum: 0 };
     }
     const bucket = byDept[key];
     bucket.total++;
     bucket[patient.riskLevel] = (bucket[patient.riskLevel] || 0) + 1;
     bucket.hbSum += Number(patient.hb);
+    bucket.riskScoreSum += Number(patient.riskScore);
   }
 
-  return Object.values(byDept).map((bucket) => ({
-    departamento: bucket.departamento,
-    total: bucket.total,
-    alto: bucket.alto || 0,
-    medio: bucket.medio || 0,
-    bajo: bucket.bajo || 0,
-    hbPromedio: bucket.total ? Number((bucket.hbSum / bucket.total).toFixed(1)) : null
-  }));
+  return Object.values(byDept).map((bucket) => {
+    const avgRiskScore = bucket.total ? bucket.riskScoreSum / bucket.total : 0;
+    const { vulnerabilityIndex, alertLevel } = computeVulnerability({
+      total: bucket.total,
+      alto: bucket.alto || 0,
+      avgRiskScore
+    });
+
+    return {
+      departamento: bucket.departamento,
+      total: bucket.total,
+      alto: bucket.alto || 0,
+      medio: bucket.medio || 0,
+      bajo: bucket.bajo || 0,
+      hbPromedio: bucket.total ? Number((bucket.hbSum / bucket.total).toFixed(1)) : null,
+      avgRiskScore: Number(avgRiskScore.toFixed(1)),
+      vulnerabilityIndex,
+      alertLevel
+    };
+  });
 }
 
-async function createOutboundMessage(message) {
+async function getProvinciasPuno() {
+  const patients = memoryMode ? memoryPatients : (await getPatients());
+  const byProv = {};
+
+  for (const patient of patients) {
+    if (patient.departamento !== "PUNO" || !patient.provincia) continue;
+    const key = patient.provincia;
+    if (!byProv[key]) {
+      byProv[key] = { provincia: key, total: 0, alto: 0, medio: 0, bajo: 0, hbSum: 0, riskScoreSum: 0 };
+    }
+    const bucket = byProv[key];
+    bucket.total++;
+    bucket[patient.riskLevel] = (bucket[patient.riskLevel] || 0) + 1;
+    bucket.hbSum += Number(patient.hb);
+    bucket.riskScoreSum += Number(patient.riskScore);
+  }
+
+  return Object.values(byProv).map((bucket) => {
+    const avgRiskScore = bucket.total ? bucket.riskScoreSum / bucket.total : 0;
+    const { vulnerabilityIndex, alertLevel } = computeVulnerability({
+      total: bucket.total,
+      alto: bucket.alto || 0,
+      avgRiskScore
+    });
+
+    return {
+      provincia: bucket.provincia,
+      total: bucket.total,
+      alto: bucket.alto || 0,
+      medio: bucket.medio || 0,
+      bajo: bucket.bajo || 0,
+      hbPromedio: bucket.total ? Number((bucket.hbSum / bucket.total).toFixed(1)) : null,
+      avgRiskScore: Number(avgRiskScore.toFixed(1)),
+      vulnerabilityIndex,
+      alertLevel
+    };
+  });
+}
+
+async function createAyuda(ayuda) {
   if (memoryMode) {
-    const createdMessage = {
-      id: messageCounter++,
-      patientId: message.patientId || null,
-      channel: message.channel,
-      text: message.text,
-      status: message.status,
-      providerMessageId: message.providerMessageId || null,
+    const createdAyuda = {
+      id: ayudaCounter++,
+      departamento: ayuda.departamento,
+      provincia: ayuda.provincia || null,
+      tipo: ayuda.tipo,
+      nota: ayuda.nota || "",
+      enviadoPor: ayuda.enviadoPor,
       createdAt: new Date().toISOString()
     };
-    memoryMessages.push(createdMessage);
-    return createdMessage;
+    memoryAyudas.push(createdAyuda);
+    return createdAyuda;
   }
 
   const result = await pool.query(
     `
-      INSERT INTO outbound_messages (patient_id, channel, text, status, provider_message_id, provider_response)
-      VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING id, patient_id AS "patientId", channel, text, status,
-                provider_message_id AS "providerMessageId", created_at AS "createdAt"
+      INSERT INTO ayudas (departamento, provincia, tipo, nota, enviado_por)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id, departamento, provincia, tipo, nota, enviado_por AS "enviadoPor", created_at AS "createdAt"
     `,
-    [
-      message.patientId || null,
-      message.channel,
-      message.text,
-      message.status,
-      message.providerMessageId || null,
-      JSON.stringify(message.providerResponse || {})
-    ]
+    [ayuda.departamento, ayuda.provincia || null, ayuda.tipo, ayuda.nota || "", ayuda.enviadoPor]
   );
 
   return result.rows[0];
 }
 
+async function getAyudas() {
+  if (memoryMode) {
+    return [...memoryAyudas].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }
+
+  const result = await pool.query(`
+    SELECT id, departamento, provincia, tipo, nota, enviado_por AS "enviadoPor", created_at AS "createdAt"
+    FROM ayudas
+    ORDER BY created_at DESC
+  `);
+  return result.rows;
+}
+
 async function getStats() {
+  const ayudas = await getAyudas();
+
   if (memoryMode) {
     const total = memoryPatients.length;
     const alto = memoryPatients.filter((item) => item.riskLevel === "alto").length;
     const hbPromedio = total
       ? Number((memoryPatients.reduce((sum, item) => sum + Number(item.hb), 0) / total).toFixed(1))
       : null;
-    const mensajesEnviados = memoryMessages.filter((item) => item.status === "sent").length;
 
     return {
       total,
       alto,
       hbPromedio,
-      mensajesEnviados
+      ayudasEnviadas: ayudas.length
     };
   }
 
@@ -276,17 +339,11 @@ async function getStats() {
     FROM patients
   `);
 
-  const messagesResult = await pool.query(`
-    SELECT COUNT(*)::int AS enviados
-    FROM outbound_messages
-    WHERE status = 'sent'
-  `);
-
   return {
     total: summaryResult.rows[0].total || 0,
     alto: summaryResult.rows[0].alto || 0,
     hbPromedio: summaryResult.rows[0].hb_promedio ? Number(summaryResult.rows[0].hb_promedio.toFixed(1)) : null,
-    mensajesEnviados: messagesResult.rows[0].enviados || 0
+    ayudasEnviadas: ayudas.length
   };
 }
 
@@ -295,9 +352,11 @@ module.exports = {
   initDb,
   getPatients,
   createPatient,
-  createOutboundMessage,
   getStats,
   getUserByUsername,
   createUser,
-  getPatientsByDepartment
+  getPatientsByDepartment,
+  getProvinciasPuno,
+  createAyuda,
+  getAyudas
 };

@@ -1,106 +1,99 @@
 # anemia_zero
 
-Plataforma de seguimiento predictivo y automatizado de anemia infantil en zonas rurales de Puno.
+Plataforma predictiva de seguimiento de anemia infantil en el Perú: identifica qué departamentos están más afectados y permite despachar ayuda a las zonas críticas.
 
 ## Que incluye
 
-- Dashboard por roles (Administración y Promotor de salud) con inicio de sesión.
-- Registro clinico de ninos con almacenamiento en PostgreSQL.
-- Motor de riesgo de abandono (score bajo/medio/alto).
-- Priorizacion de pacientes para intervencion.
-- Integracion con Telegram (BotFather) para seguimiento automatizado.
-- Webhook para recibir respuestas simples de cuidadores.
-- Contenedores Docker para despliegue rapido.
+- Dashboard por roles (Administración y Promotor de salud) con inicio de sesión, hecho con Tailwind CSS y animaciones.
+- Registro clínico de niños con almacenamiento en PostgreSQL (con modo memoria automático si no hay DB disponible).
+- Motor de riesgo por paciente (score bajo/medio/alto) — `src/riskModel.js`.
+- **Modelo predictivo de vulnerabilidad por departamento** — `src/predictiveModel.js`: agrega el riesgo real de los pacientes registrados en cada departamento y calcula un índice 0-100 con 4 niveles (bajo / moderado / alerta / crítico).
+- **Mapa predictivo interactivo** de los 25 departamentos del Perú (límites geográficos reales), con zoom, arrastre y clic para ver el detalle de cada zona, coloreado por el índice de vulnerabilidad.
+- **Despacho de ayuda**: cuando un departamento está en alerta o crítico, el rol Administración puede registrar el envío de ayuda (brigada médica, kits, campañas) directamente desde el mapa.
+- Análisis histórico de 405k atenciones (`TB_DIGTEL_ANEMIA_ATENDIDOS.csv`): tablas, mapa de calor por año/edad, diagnósticos más frecuentes.
 
 ## Stack
 
-- Frontend: HTML, CSS, JavaScript (sin build, servido por Express)
+- Frontend: HTML + Tailwind CSS (CDN) + JavaScript vanilla (`app.js`), sin build step
 - Backend: Node.js + Express, sesiones por cookie httpOnly
-- Base de datos: PostgreSQL (con modo memoria automatico si no hay DB disponible)
-- Mensajeria: Telegram Bot API
+- Base de datos: PostgreSQL (con modo memoria automático si no hay DB disponible)
 
 ## Roles y acceso
 
-El dashboard tiene dos roles con vistas distintas en el sidebar:
-
 | Rol | Usuario demo | Contraseña demo | Acceso |
 |---|---|---|---|
-| Administración | `admin` | `anemia2026` | Todo: resumen, pacientes, registro, configuración de Telegram (token/webhook) |
-| Promotor de salud | `promotor` | `anemia2026` | Resumen, pacientes, registro. No ve la configuración de Telegram |
+| Administración | `admin` | `anemia2026` | Todo: resumen, pacientes, registro, mapa predictivo, **despachar ayuda** |
+| Promotor de salud | `promotor` | `anemia2026` | Resumen, pacientes, registro, mapa predictivo (sin poder despachar ayuda) |
 
-Estas cuentas se crean automáticamente al iniciar el servidor por primera vez (ver `DEFAULT_USERS` en `src/db.js`). **Cambia estas contraseñas antes de usar la app fuera de la demo.**
+Estas cuentas se crean automáticamente al iniciar el servidor por primera vez (`DEFAULT_USERS` en `src/db.js`). **Cambia estas contraseñas antes de usar la app fuera de la demo.**
 
-## 1) Ejecutar local (sin Docker)
+## Ejecutar local
 
 1. Instala Node.js 20+ y PostgreSQL (opcional: sin PostgreSQL la app arranca igual en modo memoria).
-2. Duplica `.env.example` como `.env` y completa variables (token de Telegram incluido).
-3. Instala dependencias:
+2. Duplica `.env.example` como `.env`.
+3. Instala dependencias y arranca:
 
 ```bash
 npm install
-```
-
-4. Inicia el servidor:
-
-```bash
 npm start
 ```
 
-5. Abre `http://localhost:3000` e inicia sesión con una de las cuentas demo.
+4. Abre `http://localhost:3000` e inicia sesión con una cuenta demo.
 
-## 2) Ejecutar con Docker (recomendado para hackaton)
-
-1. Crea un archivo `.env` con tu token de Telegram (ver `.env.example`).
-2. Levanta todo:
+## Ejecutar con Docker
 
 ```bash
 docker compose up --build
 ```
 
-3. Abre `http://localhost:3000`.
+Abre `http://localhost:3000`.
 
-## 3) Conectar Telegram con BotFather
+## Desplegar en Vercel
 
-1. En Telegram, habla con **@BotFather**, crea un bot (`/newbot`) y copia el token que te entrega.
-2. Pega ese token en `TELEGRAM_BOT_TOKEN` dentro de `.env` (o pégalo en el campo "Token del bot" de la vista *Configuración Telegram*, solo visible para el rol Administración).
-3. Inicia sesión como `admin` y entra a **Configuración Telegram** → pulsa **"Probar getMe"** para validar la conexión.
-4. Para que el bot te responda automáticamente cuando el cuidador escribe "OK", necesitas un webhook con URL pública:
-   - En local, expón el puerto 3000 con [ngrok](https://ngrok.com/) (`ngrok http 3000`) u otro túnel.
-   - Pon esa URL pública en "Base URL pública para webhook" y pulsa **"Configurar webhook"**.
-   - El endpoint que Telegram llamará será:
+El proyecto ya trae `vercel.json` (corre `src/server.js` como función serverless con `@vercel/node`, e incluye `index.html`/`app.js` para que se sirvan estáticos).
 
-```text
-https://tu-url-publica/api/telegram/webhook?secret=TU_SECRETO
+1. Sube el repo a GitHub (o usa `vercel` desde la CLI directo en esta carpeta).
+2. En [vercel.com](https://vercel.com), **Add New → Project** e importa el repo. Vercel detecta `vercel.json` automáticamente, no hace falta configurar framework.
+3. En **Environment Variables** del proyecto en Vercel agrega, como mínimo:
+   - `SESSION_SECRET` — cualquier cadena larga aleatoria.
+4. Deploy.
+
+**Importante — modo memoria en serverless:** sin base de datos, la app sigue funcionando (modo memoria), pero Vercel puede reciclar la función entre invocaciones y perder pacientes/sesiones registrados en la demo. Para que quede 100% estable:
+
+1. Crea una base Postgres gratuita en [Neon](https://neon.tech) o [Supabase](https://supabase.com) (o usa Vercel Postgres desde el mismo dashboard del proyecto).
+2. Copia su cadena de conexión (`postgres://usuario:password@host/basededatos`).
+3. Agrégala como variable de entorno `DATABASE_URL` en Vercel (tiene prioridad sobre `DB_HOST`/`DB_USER`/etc., y ya viene con SSL configurado en `src/config.js`).
+4. Redeploy — en el primer request se crean las tablas solas (`initDb()` corre de forma perezosa antes de responder cualquier ruta).
+
+Sin este paso la demo funciona igual para una presentación corta; con él, los datos persisten de verdad entre visitas.
+
+## Cómo funciona el modelo predictivo
+
+Cada paciente registrado ya trae un **departamento real** (elegido al registrarlo) y un **score de riesgo** (`src/riskModel.js`, basado en hemoglobina, edad, distancia a la posta, dosis omitidas e idioma del hogar).
+
+`getPatientsByDepartment()` en `src/db.js` agrupa esos pacientes por departamento y `computeVulnerability()` en `src/predictiveModel.js` calcula:
+
+```
+índice = avgRiskScore * 0.6 + (% pacientes en riesgo alto) * 100 * 0.4
 ```
 
-5. Antes de poder enviarle mensajes a un cuidador real, esa persona debe escribirle primero al bot (buscarlo por su `@username` y pulsar "Iniciar"/`/start`). Sin ese primer contacto, Telegram no entrega mensajes al chat. El `chat_id` de esa conversación se obtiene llamando a `https://api.telegram.org/bot<token>/getUpdates` después de que el cuidador escriba, y se pega en el campo "Chat ID de Telegram del cuidador" al registrar al paciente.
-6. Si no configuras ningún token, el sistema sigue funcionando en **modo simulación** (`TELEGRAM_ALLOW_SIMULATION=true`): los mensajes se marcan como enviados pero no salen de verdad, útil para demo sin bot real.
+con 4 niveles: **bajo** (<30), **moderado** (30-49), **alerta** (50-69), **crítico** (≥70). Los departamentos sin pacientes registrados se muestran como "sin datos" — nunca se les asigna un nivel de riesgo inventado.
 
-## 4) Flujo MVP demo
-
-1. Inicia sesión (admin o promotor).
-2. Cargar demo o registrar paciente nuevo.
-3. Ver score de riesgo y panel priorizado en Resumen.
-4. Enviar seguimiento por Telegram desde la tabla de Pacientes.
-5. Revisar estadisticas en tiempo real.
+No es un modelo de machine learning entrenado: es un puntaje compuesto y explicable, igual que el score individual. Con más historial puede evolucionar a un modelo de series de tiempo real (ver sección de datos faltantes más abajo).
 
 ## Endpoints principales
 
-- `POST /api/auth/login`
-- `POST /api/auth/logout`
-- `GET /api/auth/me`
-- `GET /api/health`
-- `GET /api/patients`
-- `POST /api/patients`
+- `POST /api/auth/login` · `POST /api/auth/logout` · `GET /api/auth/me`
+- `GET /api/patients` · `POST /api/patients`
 - `POST /api/predict`
 - `GET /api/stats`
-- `POST /api/messages/send`
-- `POST /api/telegram/get-me` (solo admin)
-- `POST /api/telegram/set-webhook` (solo admin)
-- `POST /api/telegram/webhook`
+- `GET /api/geo/peru-departments` — límites reales de los 25 departamentos (SVG)
+- `GET /api/geo/patients-by-department` — pacientes reales + índice predictivo por departamento
+- `GET /api/ayudas` · `POST /api/ayudas` (solo admin)
+- `GET /api/analytics/anemia` — análisis del CSV histórico
 
 ## Modelo de negocio y sostenibilidad
 
 - Inicio B2G: MINSA, DIRESA, gobiernos locales.
-- Financiamiento inicial via grants (BID Lab, UNICEF, ProInnovate).
-- Escalabilidad SaaS / marca blanca para clinicas y ONGs.
+- Financiamiento inicial vía grants (BID Lab, UNICEF, ProInnovate).
+- Escalabilidad SaaS / marca blanca para clínicas y ONGs.
